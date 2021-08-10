@@ -1,0 +1,22 @@
+## CLK
+set_io --warn-no-port clk_i 21
+
+## UART (uart0)
+set_io uart_txd_o 62
+set_io uart_rxd_i 60
+
+## GPIO - output
+set_io gpio_o[0] 112
+set_io gpio_o[1] 113
+set_io gpio_o[2] 114
+set_io gpio_o[3] 115
+set_io gpio_o[4] 116
+set_io gpio_o[5] 117
+set_io gpio_o[6] 118
+set_io gpio_o[7] 119
+
+## SPI - on-board flash
+set_io flash_sdo_o 68
+set_io flash_sck_o 70
+set_io flash_csn_o 71
+set_io flash_sdi_i 67

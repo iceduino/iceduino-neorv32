@@ -1,0 +1,476 @@
+Info: constrained 'uart_txd_o' to bel 'X8/Y31/io1'
+Info: constrained 'uart_rxd_i' to bel 'X17/Y31/io0'
+Warning: unmatched constraint 'flash_sdo_o' (on line 6)
+Warning: unmatched constraint 'flash_sck_o' (on line 7)
+Warning: unmatched constraint 'flash_csn_o' (on line 8)
+Warning: unmatched constraint 'flash_sdi_i' (on line 9)
+Warning: unmatched constraint 'spi_sdo_o' (on line 12)
+Warning: unmatched constraint 'spi_sck_o' (on line 13)
+Warning: unmatched constraint 'spi_csn_o' (on line 14)
+Warning: unmatched constraint 'spi_sdi_i' (on line 15)
+Warning: unmatched constraint 'twi_sda_io' (on line 18)
+Warning: unmatched constraint 'twi_scl_io' (on line 19)
+Warning: unmatched constraint 'gpio_i[0]' (on line 22)
+Warning: unmatched constraint 'gpio_i[1]' (on line 23)
+Warning: unmatched constraint 'gpio_i[2]' (on line 24)
+Warning: unmatched constraint 'gpio_i[3]' (on line 25)
+Info: constrained 'gpio_o[0]' to bel 'X7/Y0/io1'
+Info: constrained 'gpio_o[1]' to bel 'X6/Y0/io0'
+Info: constrained 'gpio_o[2]' to bel 'X5/Y0/io0'
+Info: constrained 'gpio_o[3]' to bel 'X8/Y0/io0'
+Info: constrained 'pwm_o[0]' to bel 'X4/Y31/io0'
+Info: constrained 'pwm_o[1]' to bel 'X5/Y31/io0'
+Info: constrained 'pwm_o[2]' to bel 'X6/Y31/io0'
+
+Info: Packing constants..
+Info: Packing IOs..
+Info: pwm_o[2] use by SB_RGBA_DRV/SB_RGB_DRV rgb_inst, not creating SB_IO
+Info: pwm_o[1] use by SB_RGBA_DRV/SB_RGB_DRV rgb_inst, not creating SB_IO
+Info: pwm_o[0] use by SB_RGBA_DRV/SB_RGB_DRV rgb_inst, not creating SB_IO
+Info: Packing LUT-FFs..
+Info:     2485 LCs used as LUT4 only
+Info:      979 LCs used as LUT4 and DFF
+Info: Packing non-LUT FFs..
+Info:      631 LCs used as DFF only
+Info: Packing carries..
+Info:      380 LCs used as CARRY only
+Info: Packing RAMs..
+Info: Placing PLLs..
+Info:   constrained PLL 'pll_inst' to X12/Y31/pll_3
+Info: Packing special functions..
+Info:   constrained SB_RGBA_DRV 'rgb_inst' to X0/Y30/rgba_drv_0
+Info:   constrained ICESTORM_HFOSC 'hsosc_inst_OSC' to X0/Y31/hfosc_1
+Info:     Derived frequency constraint of 12.0 MHz for net hf_osc_clk
+Info: Packing PLLs..
+Info:     Input frequency of PLL 'pll_inst' is constrained to 12.0 MHz
+Info:     VCO frequency of PLL 'pll_inst' is constrained to 576.0 MHz
+Info:     Derived frequency constraint of 18.0 MHz for net pll_inst_PLLOUTCORE
+Info:     Derived frequency constraint of 18.0 MHz for net pll_clk
+Info:   PLL 'pll_inst' has LOCK output, need to pass all outputs via LUT
+Info:   constrained 'pll_rstn_SB_LUT4_I3_LC' to X1/Y30/lc0
+Info: Promoting globals..
+Info: promoting neorv32_inst.sys_rstn_SB_LUT4_I3_O [reset] (fanout 980)
+Info: promoting neorv32_inst.neorv32_busswitch_inst.ca_rd_req_buf_SB_LUT4_I3_O_SB_LUT4_I2_O_SB_LUT4_I0_O_SB_LUT4_I3_O [reset] (fanout 32)
+Info: promoting neorv32_inst.neorv32_sysinfo_inst:777_SB_DFFSR_Q_5_R_SB_LUT4_O_I3_SB_LUT4_I2_I3_SB_LUT4_I3_O_SB_LUT4_I3_O [reset] (fanout 32)
+Info: promoting neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.neorv32_cpu_cp_muldiv_inst_true.neorv32_cpu_cp_muldiv_inst.state_SB_LUT4_I1_2_O [cen] (fanout 66)
+Info: promoting neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.neorv32_cpu_cp_muldiv_inst_true.neorv32_cpu_cp_muldiv_inst.state_SB_LUT4_I1_1_O [cen] (fanout 64)
+Info: promoting neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.neorv32_cpu_cp_muldiv_inst_true.neorv32_cpu_cp_muldiv_inst.state_SB_LUT4_I1_O [cen] (fanout 64)
+Info: Constraining chains...
+Info:      270 LCs used to legalise carry chains.
+Info: Checksum: 0x32eccfd5
+
+Info: Annotating ports with timing budgets for target frequency 12.00 MHz
+Info: Checksum: 0xe9210e03
+
+Info: Device utilisation:
+Info: 	         ICESTORM_LC:  4747/ 5280    89%
+Info: 	        ICESTORM_RAM:    12/   30    40%
+Info: 	               SB_IO:     6/   96     6%
+Info: 	               SB_GB:     8/    8   100%
+Info: 	        ICESTORM_PLL:     1/    1   100%
+Info: 	         SB_WARMBOOT:     0/    1     0%
+Info: 	        ICESTORM_DSP:     0/    8     0%
+Info: 	      ICESTORM_HFOSC:     1/    1   100%
+Info: 	      ICESTORM_LFOSC:     0/    1     0%
+Info: 	              SB_I2C:     0/    2     0%
+Info: 	              SB_SPI:     0/    2     0%
+Info: 	              IO_I3C:     0/    2     0%
+Info: 	         SB_LEDDA_IP:     0/    1     0%
+Info: 	         SB_RGBA_DRV:     1/    1   100%
+Info: 	      ICESTORM_SPRAM:     4/    4   100%
+
+Info: Placed 12 cells based on constraints.
+Info: Creating initial analytic placement for 3918 cells, random placement wirelen = 112357.
+Info:     at initial placer iter 0, wirelen = 1803
+Info:     at initial placer iter 1, wirelen = 1891
+Info:     at initial placer iter 2, wirelen = 1887
+Info:     at initial placer iter 3, wirelen = 1868
+Info: Running main analytical placer.
+Info:     at iteration #1, type ALL: wirelen solved = 1857, spread = 41665, legal = 58887; time = 0.76s
+Info:     at iteration #2, type ALL: wirelen solved = 2472, spread = 39903, legal = 51885; time = 0.48s
+Info:     at iteration #3, type ALL: wirelen solved = 2787, spread = 37877, legal = 50041; time = 0.53s
+Info:     at iteration #4, type ALL: wirelen solved = 3907, spread = 36458, legal = 51199; time = 0.58s
+Info:     at iteration #5, type ALL: wirelen solved = 5167, spread = 32109, legal = 47065; time = 0.48s
+Info:     at iteration #6, type ALL: wirelen solved = 7376, spread = 29382, legal = 46917; time = 0.50s
+Info:     at iteration #7, type ALL: wirelen solved = 8000, spread = 28623, legal = 39549; time = 0.30s
+Info:     at iteration #8, type ALL: wirelen solved = 9453, spread = 27198, legal = 43278; time = 0.56s
+Info:     at iteration #9, type ALL: wirelen solved = 10239, spread = 26410, legal = 37835; time = 0.32s
+Info:     at iteration #10, type ALL: wirelen solved = 11661, spread = 25778, legal = 37387; time = 0.21s
+Info:     at iteration #11, type ALL: wirelen solved = 12454, spread = 25275, legal = 37876; time = 0.37s
+Info:     at iteration #12, type ALL: wirelen solved = 13043, spread = 25432, legal = 37473; time = 0.30s
+Info:     at iteration #13, type ALL: wirelen solved = 13708, spread = 24996, legal = 35399; time = 0.20s
+Info:     at iteration #14, type ALL: wirelen solved = 14360, spread = 24842, legal = 35694; time = 0.20s
+Info:     at iteration #15, type ALL: wirelen solved = 14779, spread = 25034, legal = 35199; time = 0.21s
+Info:     at iteration #16, type ALL: wirelen solved = 15162, spread = 24826, legal = 36530; time = 0.27s
+Info:     at iteration #17, type ALL: wirelen solved = 15769, spread = 24637, legal = 34583; time = 0.18s
+Info:     at iteration #18, type ALL: wirelen solved = 16050, spread = 24735, legal = 35096; time = 0.19s
+Info:     at iteration #19, type ALL: wirelen solved = 16316, spread = 24574, legal = 40826; time = 0.39s
+Info:     at iteration #20, type ALL: wirelen solved = 16466, spread = 24797, legal = 36012; time = 0.25s
+Info:     at iteration #21, type ALL: wirelen solved = 16986, spread = 24609, legal = 36847; time = 0.35s
+Info:     at iteration #22, type ALL: wirelen solved = 17284, spread = 24689, legal = 34047; time = 0.22s
+Info:     at iteration #23, type ALL: wirelen solved = 17776, spread = 24969, legal = 40621; time = 0.37s
+Info:     at iteration #24, type ALL: wirelen solved = 18301, spread = 25802, legal = 39339; time = 0.31s
+Info:     at iteration #25, type ALL: wirelen solved = 18448, spread = 25297, legal = 34177; time = 0.17s
+Info:     at iteration #26, type ALL: wirelen solved = 18742, spread = 24936, legal = 33489; time = 0.16s
+Info:     at iteration #27, type ALL: wirelen solved = 18666, spread = 25149, legal = 38997; time = 0.34s
+Info:     at iteration #28, type ALL: wirelen solved = 19923, spread = 25887, legal = 38969; time = 0.41s
+Info:     at iteration #29, type ALL: wirelen solved = 20024, spread = 26272, legal = 38679; time = 0.32s
+Info:     at iteration #30, type ALL: wirelen solved = 20466, spread = 25998, legal = 43199; time = 0.47s
+Info:     at iteration #31, type ALL: wirelen solved = 21204, spread = 26938, legal = 36094; time = 0.20s
+Info: HeAP Placer Time: 11.75s
+Info:   of which solving equations: 2.16s
+Info:   of which spreading cells: 0.39s
+Info:   of which strict legalisation: 8.21s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 1029, wirelen = 33489
+Info:   at iteration #5: temp = 0.000000, timing cost = 1138, wirelen = 30264
+Info:   at iteration #10: temp = 0.000000, timing cost = 949, wirelen = 29024
+Info:   at iteration #15: temp = 0.000000, timing cost = 1056, wirelen = 28201
+Info:   at iteration #20: temp = 0.000000, timing cost = 1089, wirelen = 27950
+Info:   at iteration #25: temp = 0.000000, timing cost = 1035, wirelen = 27875
+Info:   at iteration #30: temp = 0.000000, timing cost = 1058, wirelen = 27825
+Info:   at iteration #35: temp = 0.000000, timing cost = 1031, wirelen = 27803
+Info:   at iteration #36: temp = 0.000000, timing cost = 1056, wirelen = 27808 
+Info: SA placement time 8.38s
+
+Info: Max frequency for clock 'pll_clk': 23.46 MHz (PASS at 18.00 MHz)
+
+Info: Max delay <async>         -> posedge pll_clk: 4.01 ns
+Info: Max delay posedge pll_clk -> <async>        : 9.00 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 24 endpoint(s)
+Info:          + represents [1,24) endpoint(s)
+Info: [ 12930,  16229) |*+
+Info: [ 16229,  19528) |***+
+Info: [ 19528,  22827) |********+
+Info: [ 22827,  26126) |*********+
+Info: [ 26126,  29425) |************+
+Info: [ 29425,  32724) |***************+
+Info: [ 32724,  36023) |*******************************+
+Info: [ 36023,  39322) |************************************************************ 
+Info: [ 39322,  42621) |***********************+
+Info: [ 42621,  45920) |*****************+
+Info: [ 45920,  49219) |********************************+
+Info: [ 49219,  52518) |**********************************************************+
+Info: [ 52518,  55817) | 
+Info: [ 55817,  59116) | 
+Info: [ 59116,  62415) | 
+Info: [ 62415,  65714) | 
+Info: [ 65714,  69013) | 
+Info: [ 69013,  72312) | 
+Info: [ 72312,  75611) |+
+Info: [ 75611,  78910) |+
+Info: Checksum: 0xe1b04fb0
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 15268 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:       1000 |       35        726 |   35   726 |     14307|       0.38       0.38|
+Info:       2000 |       49       1647 |   14   921 |     13321|       0.18       0.55|
+Info:       3000 |      106       2590 |   57   943 |     12388|       0.21       0.77|
+Info:       4000 |      167       3529 |   61   939 |     11458|       0.18       0.95|
+Info:       5000 |      297       4399 |  130   870 |     10630|       0.23       1.18|
+Info:       6000 |      436       5260 |  139   861 |      9826|       0.22       1.41|
+Info:       7000 |      608       6088 |  172   828 |      9070|       0.22       1.63|
+Info:       8000 |      781       6915 |  173   827 |      8290|       0.46       2.09|
+Info:       9000 |      946       7750 |  165   835 |      7519|       0.50       2.59|
+Info:      10000 |     1163       8533 |  217   783 |      6850|       0.33       2.92|
+Info:      11000 |     1456       9240 |  293   707 |      6382|       0.35       3.27|
+Info:      12000 |     1751       9945 |  295   705 |      5801|       0.35       3.62|
+Info:      13000 |     2159      10537 |  408   592 |      5414|       0.49       4.10|
+Info:      14000 |     2601      11095 |  442   558 |      5187|       0.65       4.75|
+Info:      15000 |     3036      11660 |  435   565 |      4893|       0.53       5.28|
+Info:      16000 |     3484      12212 |  448   552 |      4726|       0.48       5.75|
+Info:      17000 |     3940      12756 |  456   544 |      4443|       0.44       6.20|
+Info:      18000 |     4397      13299 |  457   543 |      4220|       0.53       6.73|
+Info:      19000 |     4957      13739 |  560   440 |      4055|       0.57       7.30|
+Info:      20000 |     5448      14248 |  491   509 |      3884|       0.56       7.86|
+Info:      21000 |     5940      14756 |  492   508 |      3708|       0.57       8.43|
+Info:      22000 |     6532      15164 |  592   408 |      3670|       0.59       9.01|
+Info:      23000 |     7043      15653 |  511   489 |      3556|       0.63       9.65|
+Info:      24000 |     7577      16119 |  534   466 |      3501|       0.65      10.29|
+Info:      25000 |     8146      16550 |  569   431 |      3427|       0.60      10.90|
+Info:      26000 |     8699      16997 |  553   447 |      3335|       0.60      11.50|
+Info:      27000 |     9220      17476 |  521   479 |      3109|       0.65      12.15|
+Info:      28000 |     9781      17915 |  561   439 |      3056|       0.90      13.05|
+Info:      29000 |    10370      18326 |  589   411 |      3005|       0.71      13.76|
+Info:      30000 |    10925      18771 |  555   445 |      2940|       0.93      14.68|
+Info:      31000 |    11507      19189 |  582   418 |      2935|       0.72      15.40|
+Info:      32000 |    12054      19642 |  547   453 |      2797|       0.80      16.21|
+Info:      33000 |    12585      20111 |  531   469 |      2768|       0.69      16.89|
+Info:      34000 |    13143      20553 |  558   442 |      2718|       0.80      17.70|
+Info:      35000 |    13737      20959 |  594   406 |      2686|       0.78      18.48|
+Info:      36000 |    14299      21397 |  562   438 |      2680|       0.78      19.26|
+Info:      37000 |    14909      21787 |  610   390 |      2636|       0.69      19.95|
+Info:      38000 |    15460      22236 |  551   449 |      2543|       0.68      20.63|
+Info:      39000 |    16012      22684 |  552   448 |      2518|       0.78      21.40|
+Info:      40000 |    16566      23130 |  554   446 |      2429|       0.67      22.07|
+Info:      41000 |    17141      23555 |  575   425 |      2377|       0.70      22.78|
+Info:      42000 |    17753      23943 |  612   388 |      2312|       0.66      23.43|
+Info:      43000 |    18367      24329 |  614   386 |      2281|       0.83      24.26|
+Info:      44000 |    18979      24717 |  612   388 |      2267|       0.80      25.06|
+Info:      45000 |    19615      25081 |  636   364 |      2178|       0.94      26.01|
+Info:      46000 |    20176      25520 |  561   439 |      2114|       0.77      26.78|
+Info:      47000 |    20740      25956 |  564   436 |      1994|       0.57      27.35|
+Info:      48000 |    21318      26378 |  578   422 |      1921|       0.85      28.20|
+Info:      49000 |    21857      26839 |  539   461 |      1866|       0.83      29.03|
+Info:      50000 |    22430      27266 |  573   427 |      1768|       0.70      29.73|
+Info:      51000 |    22992      27704 |  562   438 |      1652|       0.70      30.43|
+Info:      52000 |    23509      28187 |  517   483 |      1306|       0.37      30.80|
+Info:      53000 |    24172      28524 |  663   337 |      1190|       0.50      31.31|
+Info:      54000 |    24497      29199 |  325   675 |       737|       0.94      32.25|
+Info:      55000 |    24943      29753 |  446   554 |       503|       0.84      33.09|
+Info:      56000 |    25548      30148 |  605   395 |       391|       0.66      33.75|
+Info:      56573 |    25681      30356 |  133   208 |         0|       0.21      33.96|
+Info: Routing complete.
+Info: Router1 time 33.96s
+Info: Checksum: 0x21ea3832
+
+Info: Critical path report for clock 'pll_clk' (posedge -> posedge):
+Info: curr total
+Info:  1.2  1.2  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.7046.0.0.0_RAM.RDATA_0
+Info:  4.2  5.4    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst:857[0] budget 4.698000 ns (6,11) -> (9,3)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_bus_inst.exclusive_lock_SB_LUT4_I2_O_SB_LUT4_O_I0_SB_LUT4_O_I2_SB_LUT4_O_LC.I2
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:29.22-29.23
+Info:  1.2  6.6  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_bus_inst.exclusive_lock_SB_LUT4_I2_O_SB_LUT4_O_I0_SB_LUT4_O_I2_SB_LUT4_O_LC.O
+Info:  4.2 10.9    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_bus_inst.exclusive_lock_SB_LUT4_I2_O_SB_LUT4_O_I0_SB_LUT4_O_I2[0] budget 4.698000 ns (9,3) -> (9,13)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_bus_inst.exclusive_lock_SB_LUT4_I2_O_SB_LUT4_O_I0_SB_LUT4_O_I2_SB_LUT4_I2_LC.I2
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/cells_map.v:6.21-6.22
+Info:  1.2 12.1  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_bus_inst.exclusive_lock_SB_LUT4_I2_O_SB_LUT4_O_I0_SB_LUT4_O_I2_SB_LUT4_I2_LC.O
+Info:  1.8 13.8    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_bus_inst.exclusive_lock_SB_LUT4_I2_O_SB_LUT4_O_I0_SB_LUT4_O_I2_SB_LUT4_I2_O[0] budget 4.698000 ns (9,13) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_32_LC.I1
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:29.22-29.23
+Info:  0.7 14.5  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_32_LC.COUT
+Info:  0.0 14.5    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[1] budget 0.000000 ns (8,14) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_21_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 14.8  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_21_LC.COUT
+Info:  0.0 14.8    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[2] budget 0.000000 ns (8,14) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_10_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 15.1  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_10_LC.COUT
+Info:  0.0 15.1    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[3] budget 0.000000 ns (8,14) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_6_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 15.3  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_6_LC.COUT
+Info:  0.0 15.3    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[4] budget 0.000000 ns (8,14) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_5_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 15.6  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_5_LC.COUT
+Info:  0.0 15.6    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[5] budget 0.000000 ns (8,14) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_4_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 15.9  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_4_LC.COUT
+Info:  0.0 15.9    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[6] budget 0.000000 ns (8,14) -> (8,14)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_3_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 16.2  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_3_LC.COUT
+Info:  0.6 16.7    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[7] budget 0.560000 ns (8,14) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_2_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 17.0  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_2_LC.COUT
+Info:  0.0 17.0    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[8] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_1_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 17.3  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_1_LC.COUT
+Info:  0.0 17.3    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[9] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 17.6  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_LC.COUT
+Info:  0.0 17.6    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[10] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_31_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 17.8  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_31_LC.COUT
+Info:  0.0 17.8    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[11] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_30_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 18.1  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_30_LC.COUT
+Info:  0.0 18.1    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[12] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_29_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 18.4  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_29_LC.COUT
+Info:  0.0 18.4    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[13] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_28_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 18.7  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_28_LC.COUT
+Info:  0.0 18.7    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[14] budget 0.000000 ns (8,15) -> (8,15)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_27_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 18.9  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_27_LC.COUT
+Info:  0.6 19.5    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[15] budget 0.560000 ns (8,15) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_26_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 19.8  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_26_LC.COUT
+Info:  0.0 19.8    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[16] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_25_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 20.1  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_25_LC.COUT
+Info:  0.0 20.1    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[17] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_24_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 20.3  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_24_LC.COUT
+Info:  0.0 20.3    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[18] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_23_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 20.6  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_23_LC.COUT
+Info:  0.0 20.6    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[19] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_22_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 20.9  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_22_LC.COUT
+Info:  0.0 20.9    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[20] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_20_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 21.2  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_20_LC.COUT
+Info:  0.0 21.2    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[21] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_19_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 21.4  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_19_LC.COUT
+Info:  0.0 21.4    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[22] budget 0.000000 ns (8,16) -> (8,16)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_18_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 21.7  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_18_LC.COUT
+Info:  0.6 22.3    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[23] budget 0.560000 ns (8,16) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_17_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 22.6  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_17_LC.COUT
+Info:  0.0 22.6    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[24] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_16_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 22.8  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_16_LC.COUT
+Info:  0.0 22.8    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[25] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_15_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 23.1  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_15_LC.COUT
+Info:  0.0 23.1    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[26] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_14_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 23.4  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_14_LC.COUT
+Info:  0.0 23.4    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[27] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_13_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 23.7  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_13_LC.COUT
+Info:  0.0 23.7    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[28] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_12_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 23.9  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_12_LC.COUT
+Info:  0.0 23.9    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[29] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_11_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 24.2  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_11_LC.COUT
+Info:  0.0 24.2    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[30] budget 0.000000 ns (8,17) -> (8,17)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_9_LC.CIN
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.3 24.5  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_9_LC.COUT
+Info:  1.2 25.7    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_I3[31] budget 1.220000 ns (8,17) -> (8,18)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_8_LC.I3
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:  0.9 26.6  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst.addsub_res_SB_LUT4_O_8_LC.O
+Info:  1.8 28.4    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_alu_inst:866[31] budget 4.697000 ns (8,18) -> (7,19)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_I2_SB_LUT4_O_1_I2_SB_LUT4_O_LC.I3
+Info:  0.9 29.2  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_I2_SB_LUT4_O_1_I2_SB_LUT4_O_LC.O
+Info:  1.8 31.0    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_I2_SB_LUT4_O_1_I2[2] budget 4.697000 ns (7,19) -> (7,19)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_I2_SB_LUT4_O_1_LC.I2
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/cells_map.v:6.21-6.22
+Info:  1.2 32.2  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_I2_SB_LUT4_O_1_LC.O
+Info:  2.3 34.5    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_I2[2] budget 4.697000 ns (7,19) -> (5,19)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_LC.I3
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/cells_map.v:6.21-6.22
+Info:  0.9 35.4  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0_SB_LUT4_O_1_LC.O
+Info:  1.8 37.1    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_I0[2] budget 4.697000 ns (5,19) -> (5,18)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_LC.I2
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/ice40/cells_map.v:6.21-6.22
+Info:  1.2 38.3  Source neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata_SB_LUT4_O_13_LC.O
+Info:  1.8 40.1    Net neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.rf_wdata[31] budget 4.697000 ns (5,18) -> (6,19)
+Info:                Sink neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.7046.1.0.0_RAM.WDATA_15
+Info:  0.1 40.2  Setup neorv32_inst.neorv32_cpu_inst.neorv32_cpu_regfile_inst.7046.1.0.0_RAM.WDATA_15
+Info: 17.7 ns logic, 22.5 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge pll_clk':
+Info: curr total
+Info:  0.0  0.0  Source uart_rxd_i$sb_io.D_IN_0
+Info:  3.2  3.2    Net uart_rxd_i$SB_IO_IN budget 54.318001 ns (17,31) -> (18,29)
+Info:                Sink uart_rxd_i_SB_DFF_D_DFFLC.I0
+Info:  1.2  4.4  Setup uart_rxd_i_SB_DFF_D_DFFLC.I0
+Info: 1.2 ns logic, 3.2 ns routing
+
+Info: Critical path report for cross-domain path 'posedge pll_clk' -> '<async>':
+Info: curr total
+Info:  1.4  1.4  Source neorv32_inst.neorv32_gpio_inst_true.neorv32_gpio_inst.dout_lo_SB_DFFE_Q_28_DFFLC.O
+Info:  8.0  9.4    Net gpio_o[3]$SB_IO_OUT budget 81.943001 ns (16,30) -> (8,0)
+Info:                Sink gpio_o[3]$sb_io.D_OUT_0
+Info:                Defined in:
+Info:                  /opt/fpga-toolchain/bin/../share/yosys/techmap.v:571.28-571.29
+Info: 1.4 ns logic, 8.0 ns routing
+
+Info: Max frequency for clock 'pll_clk': 24.88 MHz (PASS at 18.00 MHz)
+
+Info: Max delay <async>         -> posedge pll_clk: 4.38 ns
+Info: Max delay posedge pll_clk -> <async>        : 9.43 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 24 endpoint(s)
+Info:          + represents [1,24) endpoint(s)
+Info: [ 15351,  18539) |**+
+Info: [ 18539,  21727) |***********+
+Info: [ 21727,  24915) |*******+
+Info: [ 24915,  28103) |*********+
+Info: [ 28103,  31291) |**********+
+Info: [ 31291,  34479) |**************************+
+Info: [ 34479,  37667) |***************************+
+Info: [ 37667,  40855) |*****************+
+Info: [ 40855,  44043) |************************************************************ 
+Info: [ 44043,  47231) |***********************+
+Info: [ 47231,  50419) |**************************************************+
+Info: [ 50419,  53607) |*****************************+
+Info: [ 53607,  56795) | 
+Info: [ 56795,  59983) | 
+Info: [ 59983,  63171) | 
+Info: [ 63171,  66359) | 
+Info: [ 66359,  69547) | 
+Info: [ 69547,  72735) | 
+Info: [ 72735,  75923) |+
+Info: [ 75923,  79111) |+
+14 warnings, 0 errors
+
+Info: Program finished normally.
