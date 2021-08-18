@@ -77,12 +77,14 @@ ${IMPL_NAME}.json: work-obj08.cf
 ${IMPL_NAME}.asc: ${IMPL_NAME}.json ${PCF_SRC}
 	nextpnr-ice40 --ignore-loops --timing-allow-fail \
 	  --hx8k --package tq144:4k --json $< --pcf ${PCF_SRC} \
-	  --asc $@ 2>&1 | tee nextpnr-report.txt
+	  --pcf-allow-unconstrained --asc $@ 2>&1 \
+    | tee nextpnr-report.txt
 
 ${IMPL_NAME}.bin: ${IMPL_NAME}.asc
 	icepack $< $@
 	
 flash: ${IMPL_NAME}.bin
 	iceprog $< 
+  
 clean:
-	rm -f *.cf *.asc *.json *-report.txt
+	rm -f *.cf *.asc *.json *-report.txt *.bin
