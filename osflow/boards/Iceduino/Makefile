@@ -68,23 +68,19 @@ ice40-obj08.cf: ${ICE40_SRC}
 neorv32-obj08.cf: ice40-obj08.cf ${NEORV32_PKG} ${NEORV32_SRC}
 	ghdl -a --std=08 --work=neorv32 ${NEORV32_PKG} ${NEORV32_SRC}
 
-work-obj08.cf: neorv32-obj08.cf ${TOP_SRC}
-	ghdl -a --std=08 --work=work ${TOP_SRC}
+iceduino-obj08.cf: neorv32-obj08.cf ${TOP_SRC}
+	ghdl -a --std=08 --work=iceduino ${TOP_SRC}
 	
-${IMPL_NAME}.json: work-obj08.cf
-	yosys -p 'ghdl --std=08 --no-formal neorv32_iceduino_top; synth_ice40 -dsp -json $@' 2>&1 | tee yosys-report.txt
+${IMPL_NAME}.json: iceduino-obj08.cf
+	yosys -p 'ghdl --std=08 --work=iceduino --no-formal neorv32_iceduino_top; synth_ice40 -dsp -json $@' 2>&1 | tee yosys-report.txt
 
 ${IMPL_NAME}.asc: ${IMPL_NAME}.json ${PCF_SRC}
-	nextpnr-ice40 --ignore-loops --timing-allow-fail \
+	nextpnr-ice40 --ignore-loops --freq 50 --timing-allow-fail \
 	  --hx8k --package tq144:4k --json $< --pcf ${PCF_SRC} \
-	  --pcf-allow-unconstrained --asc $@ 2>&1 \
-    | tee nextpnr-report.txt
+	  --asc $@ 2>&1 | tee nextpnr-report.txt
 
 ${IMPL_NAME}.bin: ${IMPL_NAME}.asc
 	icepack $< $@
-	
-flash: ${IMPL_NAME}.bin
-	iceprog $< 
-  
+
 clean:
 	rm -f *.cf *.asc *.json *-report.txt *.bin
