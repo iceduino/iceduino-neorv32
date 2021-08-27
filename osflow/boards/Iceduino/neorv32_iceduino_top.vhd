@@ -40,6 +40,8 @@ use ieee.numeric_std.all;
 library iCE40;
 use iCE40.components.all; -- for device primitives and macros
 
+library iceduino;
+
 library neorv32;
 use neorv32.neorv32_package.all; -- for device primitives and macros
 
@@ -109,6 +111,20 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
   signal con_gpio : std_ulogic_vector(63 downto 0);
 
   signal con_spi_csn  : std_ulogic_vector(07 downto 0);
+  
+  --shared with all slaves
+  signal reg_tag_o       : std_ulogic_vector(02 downto 0):=(others => '0'); -- request tag
+  signal reg_adr_o       : std_ulogic_vector(31 downto 0):=(others => '0'); -- address	
+  signal reg_dat_o       : std_ulogic_vector(31 downto 0):=(others => '0'); -- write data
+  signal reg_we_o        : std_ulogic:= '0'; -- read/write
+  signal reg_sel_o       : std_ulogic_vector(03 downto 0):=(others => '0'); -- byte enable
+  signal reg_stb_o       : std_ulogic := '0'; -- strobe
+  signal reg_cyc_o       : std_ulogic := '0'; -- valid cycle
+  signal reg_lock_o      : std_ulogic := '0'; -- exclusive access request
+  --arbiter for slave outputs
+  signal arb_dat_i       : std_logic_vector(31 downto 0):=(others => 'U'); -- read data
+  signal arb_ack_i       : std_logic := 'L'; -- transfer acknowledge
+  signal arb_err_i       : std_logic:= 'L'; -- transfer error
 
 begin
 
@@ -201,8 +217,8 @@ begin
       ICACHE_ASSOCIATIVITY         => 1,      -- i-cache: associativity / number of sets (1=direct_mapped), has to be a power of 2
   
       -- External memory interface (WISHBONE) --
-      MEM_EXT_EN                   => false,  -- implement external memory bus interface?
-      MEM_EXT_TIMEOUT              => 255,    -- cycles after a pending bus access auto-terminates (0 = disabled)
+      MEM_EXT_EN                   => true,  -- implement external memory bus interface?
+      MEM_EXT_TIMEOUT              => 0,    -- cycles after a pending bus access auto-terminates (0 = disabled, default = 255)
       -- MEM_EXT_PIPE_MODE            => false,  -- protocol: false=classic/standard wishbone mode, true=pipelined wishbone mode
       -- MEM_EXT_BIG_ENDIAN           => false,  -- byte order: true=big-endian, false=little-endian
       -- MEM_EXT_ASYNC_RX             => false,  -- use register buffer for RX data when false
@@ -248,17 +264,18 @@ begin
     jtag_tms_i     => 'U', -- mode select
 
     -- Wishbone bus interface (available if MEM_EXT_EN = true) --
-    wb_tag_o       => open, -- request tag
-    wb_adr_o       => open, -- address
-    wb_dat_i       => (others => 'U'), -- read data
-    wb_dat_o       => open, -- write data
-    wb_we_o        => open, -- read/write
-    wb_sel_o       => open, -- byte enable
-    wb_stb_o       => open, -- strobe
-    wb_cyc_o       => open, -- valid cycle
-    wb_lock_o      => open, -- exclusive access request
-    wb_ack_i       => 'L', -- transfer acknowledge
-    wb_err_i       => 'L', -- transfer error
+    wb_tag_o       => reg_tag_o, -- request tag
+    wb_adr_o       => reg_adr_o, -- address
+    wb_dat_i       => arb_dat_i, -- read data
+    wb_dat_o       => reg_dat_o, -- write data
+    wb_we_o        => reg_we_o, -- read/write
+    wb_sel_o       => reg_sel_o, -- byte enable
+    wb_stb_o       => reg_stb_o, -- strobe
+    wb_cyc_o       => reg_cyc_o, -- valid cycle
+    wb_lock_o      => reg_lock_o, -- exclusive access request
+    wb_ack_i       => arb_ack_i, -- transfer acknowledge
+    wb_err_i       => arb_err_i, -- transfer error
+   
 
     -- Advanced memory control signals (available if MEM_EXT_EN = true) --
     fence_o        => open, -- indicates an executed FENCE operation
@@ -324,6 +341,27 @@ begin
     mext_irq_i     => 'L'  -- machine external interrupt
   );
 
+  
+  iceduino_dummy_slave1_inst: entity iceduino.iceduino_dummy_slave1
+    port map (
+        clk_i       =>  pll_clk,
+        rstn_i      =>  pll_rstn,  
+        --wishbone-
+        tag_i		=>	reg_tag_o,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  arb_dat_i,
+        we_i        =>  reg_we_o,
+        sel_i		=>	reg_sel_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        lock_i      =>  reg_lock_o,
+        ack_o       =>  arb_ack_i,
+        err_o       =>  arb_err_i   
+    );
+	
+
+    
   led <= con_gpio(7 downto 0);
 
   flash_csn <= con_spi_csn(0);

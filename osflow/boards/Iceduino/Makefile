@@ -51,6 +51,9 @@ ICE40_SRC := \
   ../../device/ice40/sb_ice40_components.vhd
 PCF_SRC := \
   ../../constraint/iceduino.pcf
+ICEDUINO_SRC := \
+  ../../device/Iceduino/iceduino_dummy_slave1.vhd \
+  ../../device/Iceduino/iceduino_dummy_slave2.vhd
 DESIGN_NAME := iceduino
 IMPL_NAME := ${DESIGN_NAME}_impl
 
@@ -64,15 +67,18 @@ bin: ${IMPL_NAME}.bin
 
 ice40-obj08.cf: ${ICE40_SRC}
 	ghdl -a --std=08 --work=iCE40 ${ICE40_SRC}
+	
+iceduino-obj08.cf: ice40-obj08.cf ${ICEDUINO_SRC}
+	ghdl -a --std=08 --work=iceduino ${ICEDUINO_SRC}
 
-neorv32-obj08.cf: ice40-obj08.cf ${NEORV32_PKG} ${NEORV32_SRC}
+neorv32-obj08.cf: iceduino-obj08.cf ${NEORV32_PKG} ${NEORV32_SRC}
 	ghdl -a --std=08 --work=neorv32 ${NEORV32_PKG} ${NEORV32_SRC}
 
-iceduino-obj08.cf: neorv32-obj08.cf ${TOP_SRC}
-	ghdl -a --std=08 --work=iceduino ${TOP_SRC}
+top-obj08.cf: neorv32-obj08.cf ${TOP_SRC}
+	ghdl -a --std=08 --work=top ${TOP_SRC}
 	
-${IMPL_NAME}.json: iceduino-obj08.cf
-	yosys -p 'ghdl --std=08 --work=iceduino --no-formal neorv32_iceduino_top; synth_ice40 -dsp -json $@' 2>&1 | tee yosys-report.txt
+${IMPL_NAME}.json: top-obj08.cf
+	yosys -p 'ghdl --std=08 --work=top --no-formal neorv32_iceduino_top; synth_ice40 -dsp -json $@' 2>&1 | tee yosys-report.txt
 
 ${IMPL_NAME}.asc: ${IMPL_NAME}.json ${PCF_SRC}
 	nextpnr-ice40 --ignore-loops --freq 50 --timing-allow-fail \
