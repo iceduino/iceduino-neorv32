@@ -2,15 +2,15 @@ RTL_CORE_SRC := ../../../neorv32/rtl/core
 
 NEORV32_PKG := $(RTL_CORE_SRC)/neorv32_package.vhd
 
-NEORV32_APP_SRC := \
-  $(RTL_CORE_SRC)/neorv32_application_image.vhd \
+NEORV32_APPIMG_SRC := \
+  ../../device/Iceduino/neorv32_application_image.vhd \
+  ../../device/Iceduino/neorv32_bootloader_image.vhd
 
 NEORV32_MEM_SRC := \
   $(RTL_CORE_SRC)/neorv32_imem.vhd \
   $(RTL_CORE_SRC)/neorv32_dmem.vhd \
 
 NEORV32_CORE_SRC := \
-  $(RTL_CORE_SRC)/neorv32_bootloader_image.vhd \
   $(RTL_CORE_SRC)/neorv32_boot_rom.vhd \
   $(RTL_CORE_SRC)/neorv32_bus_keeper.vhd \
   $(RTL_CORE_SRC)/neorv32_busswitch.vhd \
@@ -43,7 +43,7 @@ NEORV32_CORE_SRC := \
   $(RTL_CORE_SRC)/neorv32_wishbone.vhd \
   $(RTL_CORE_SRC)/neorv32_xirq.vhd
 
-NEORV32_SRC := ${NEORV32_APP_SRC} ${NEORV32_MEM_SRC} ${NEORV32_CORE_SRC}
+NEORV32_SRC := ${NEORV32_APPIMG_SRC} ${NEORV32_MEM_SRC} ${NEORV32_CORE_SRC}
 TOP_SRC := \
   neorv32_iceduino_top.vhd
 
@@ -52,8 +52,8 @@ ICE40_SRC := \
 PCF_SRC := \
   ../../constraint/iceduino.pcf
 ICEDUINO_SRC := \
-  ../../device/Iceduino/iceduino_dummy_slave1.vhd \
-  ../../device/Iceduino/iceduino_dummy_slave2.vhd
+  ../../device/Iceduino/iceduino_dummy_slave1.vhd 
+  
 DESIGN_NAME := iceduino
 IMPL_NAME := ${DESIGN_NAME}_impl
 
@@ -67,11 +67,8 @@ bin: ${IMPL_NAME}.bin
 
 ice40-obj08.cf: ${ICE40_SRC}
 	ghdl -a --std=08 --work=iCE40 ${ICE40_SRC}
-	
-iceduino-obj08.cf: ice40-obj08.cf ${ICEDUINO_SRC}
-	ghdl -a --std=08 --work=iceduino ${ICEDUINO_SRC}
 
-neorv32-obj08.cf: iceduino-obj08.cf ${NEORV32_PKG} ${NEORV32_SRC}
+neorv32-obj08.cf: ice40-obj08.cf ${NEORV32_PKG} ${NEORV32_SRC}
 	ghdl -a --std=08 --work=neorv32 ${NEORV32_PKG} ${NEORV32_SRC}
 
 top-obj08.cf: neorv32-obj08.cf ${TOP_SRC}

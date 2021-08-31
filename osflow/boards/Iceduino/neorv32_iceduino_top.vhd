@@ -170,7 +170,6 @@ begin
   generic map (
 	    -- General --
       CLOCK_FREQUENCY              => f_clock_c,           -- clock frequency of clk_i in Hz
-      USER_CODE                    => x"00000000", -- custom user code
       HW_THREAD_ID                 => 0,      -- hardware thread id (32-bit)
       INT_BOOTLOADER_EN            => true,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
   
