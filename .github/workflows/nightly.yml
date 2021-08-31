@@ -18,12 +18,12 @@ jobs:
       - name: Build Neorv32
         uses: docker://gcr.io/hdl-containers/impl/icestorm
         with:
-          args: make -C iceduino-neorv32/osflow/boards/iceduino all
+          args: make -C $GITHUB_WORKSPACE/iceduino-neorv32/osflow/boards/iceduino all
 
       - name: Create report
         run: |
-          echo osflow/boards/iceduino/yosys-report.txt >> report.txt
-          echo osflow/boards/iceduino/nextpnr-report.txt >> report.txt
+          echo $GITHUB_WORKSPACE/iceduino-neorv32/osflow/boards/iceduino/yosys-report.txt >> report.txt
+          echo $GITHUB_WORKSPACE/iceduino-neorv32/osflow/boards/iceduino/nextpnr-report.txt >> report.txt
 
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -34,4 +34,4 @@ jobs:
           title: "Nightly Build"
           files: |
             report.txt
-            osflow/boards/iceduino/iceduino_impl.bin
+            $GITHUB_WORKSPACE/iceduino-neorv32/osflow/boards/iceduino/iceduino_impl.bin
