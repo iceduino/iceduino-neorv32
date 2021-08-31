@@ -1,0 +1,37 @@
+name: Nightly Build
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      
+      - name: Build Neorv32
+        uses: docker://gcr.io/hdl-containers/impl/icestorm
+        with:
+          args: make -C osflow/boards/iceduino all
+
+      - name: Create report
+        run: |
+          echo osflow/boards/iceduino/yosys-report.txt >> report.txt
+          echo osflow/boards/iceduino/nextpnr-report.txt >> report.txt
+
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "nightly"
+          prerelease: true
+          title: "Nightly Build"
+          files: |
+            report.txt
+            osflow/boards/iceduino/iceduino_impl.bin
