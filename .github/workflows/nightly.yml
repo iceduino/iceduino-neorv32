@@ -34,4 +34,4 @@ jobs:
           title: "Nightly Build"
           files: |
             report.txt
-            osflow/boards/iceduino/Iceduino_impl.bin
+            osflow/boards/iceduino/iceduino_impl.bin
