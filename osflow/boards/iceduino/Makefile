@@ -84,7 +84,7 @@ iceduino-obj08.cf: neorv32-obj08.cf ${ICEDUINO_SRC}
 	ghdl -a --std=08 --work=iceduino ${ICEDUINO_SRC}
 	
 ${IMPL_NAME}.json: iceduino-obj08.cf
-	yosys -p 'ghdl --std=08 --work=iceduino --no-formal neorv32_iceduino_top; synth_ice40 -dsp -json $@' 2>&1 | tee yosys-report.txt
+	yosys ${GHDL_MODULE} -p 'ghdl --std=08 --work=iceduino --no-formal neorv32_iceduino_top; synth_ice40 -dsp -json $@' 2>&1 | tee yosys-report.txt
 
 ${IMPL_NAME}.asc: ${IMPL_NAME}.json ${PCF_SRC}
 	nextpnr-ice40 --ignore-loops --freq 50 \
