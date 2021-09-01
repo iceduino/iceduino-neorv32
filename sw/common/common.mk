@@ -23,8 +23,8 @@ MABI  ?= -mabi=ilp32
 USER_FLAGS ?=
 
 # Relative or absolute path to the NEORV32 home folder
-NEORV32_HOME ?= ../../neorv32/
-ICEDUINO_NEORV32_HOME ?= ../../
+NEORV32_HOME ?= ../../..
+ICEDUINO_NEORV32_HOME ?= ../..
 
 
 # -----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ target bootloader: CC_OPTS += -Wl,--defsym=make_bootloader=1 -Dmake_bootloader
 # Image generator targets
 # -----------------------------------------------------------------------------
 # install/compile tools
-$(IMAGE_GEN): $(NEORV32_EXG_PATH)/image_gen.cpp
+$(IMAGE_GEN): $(NEORV32_EXG_PATH)/image_gen.c
 	@echo Compiling $(IMAGE_GEN)
 	@$(CC_X86) $< -o $(IMAGE_GEN)
 
@@ -175,8 +175,8 @@ $(APP_EXE): main.bin $(IMAGE_GEN)
 $(APP_IMG): main.bin $(IMAGE_GEN)
 	@set -e
 	@$(IMAGE_GEN) -app_img $< $@ $(shell basename $(CURDIR))
-	@echo "Installing application image to $(NEORV32_RTL_PATH)/$(APP_IMG)"
-	@cp $(APP_IMG) $(NEORV32_RTL_PATH)/.
+	@echo "Installing application image to $(ICEDUINO_NEORV32_HOME)/osflow/boards/iceduino/$(APP_IMG)"
+	@cp $(APP_IMG) $(ICEDUINO_NEORV32_HOME)/osflow/boards/iceduino/.
 
 # Generate NEORV32 executable image in plain hex format
 $(APP_HEX): main.bin $(IMAGE_GEN)
@@ -191,8 +191,8 @@ $(APP_HEX): main.bin $(IMAGE_GEN)
 $(BOOT_IMG): main.bin $(IMAGE_GEN)
 	@set -e
 	@$(IMAGE_GEN) -bld_img $< $(BOOT_IMG) $(shell basename $(CURDIR))
-	@echo "Installing bootloader image to $(NEORV32_RTL_PATH)/$(BOOT_IMG)"
-	@cp $(BOOT_IMG) $(NEORV32_RTL_PATH)/.
+	@echo "Installing bootloader image to $(ICEDUINO_NEORV32_HOME)/osflow/boards/iceduino/$(BOOT_IMG)"
+	@cp $(BOOT_IMG) $(ICEDUINO_NEORV32_HOME)/osflow/boards/iceduino/.
 
 # Just an alias that
 bootloader: $(BOOT_IMG)

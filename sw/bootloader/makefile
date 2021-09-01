@@ -36,5 +36,6 @@
 
 # Relative or absolute path to the NEORV32 home folder
 NEORV32_HOME ?= ../../neorv32/
+MARCH ?= -march=rv32i
 
 include ../common/common.mk
