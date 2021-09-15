@@ -2,22 +2,14 @@ name: Release Build
 
 on:
   push:
-    branches: [ main ]
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-    paths:
-      - "neorv32/**"
-      - "osflow/**"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Exit if not on master branch
-        if: endsWith(github.ref, 'master') == false
-        run: exit -1
-
       - name: Checkout Repository
         uses: actions/checkout@v2
         with:
