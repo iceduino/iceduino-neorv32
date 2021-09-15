@@ -25,8 +25,8 @@ jobs:
 
       - name: Create report
         run: |
-          osflow/boards/iceduino/yosys-report.txt >> report.txt
-          osflow/boards/iceduino/nextpnr-report.txt >> report.txt
+          cat osflow/boards/iceduino/yosys-report.txt >> report.txt
+          cat osflow/boards/iceduino/nextpnr-report.txt >> report.txt
 
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
