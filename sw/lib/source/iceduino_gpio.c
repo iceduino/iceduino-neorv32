@@ -1,5 +1,4 @@
-#include "neorv32.h"
-#include "iceduino_gpio.h"
+#include "neorv32_iceduino.h"
 
 //set all pins of output 0-31
 void iceduino_gpio_set(int value) {
