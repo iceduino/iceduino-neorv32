@@ -60,7 +60,7 @@ PCF_SRC := \
   $(ICEDUINO_HOME)/osflow/constraint/iceduino.pcf
 
 ICEDUINO_SRC := \
-  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_dummy_slave1.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_gpio.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/neorv32_iceduino_top.vhd 
   
 DESIGN_NAME := iceduino

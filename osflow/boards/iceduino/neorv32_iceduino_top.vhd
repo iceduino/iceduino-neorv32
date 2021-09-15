@@ -113,6 +113,7 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
   signal con_spi_csn  : std_ulogic_vector(07 downto 0);
 
   signal external_rstn : std_ulogic;
+  signal con_led : std_ulogic_vector(31 downto 0);
   
   --shared with all slaves
   signal reg_tag_o       : std_ulogic_vector(02 downto 0):=(others => '0'); -- request tag
@@ -356,27 +357,31 @@ begin
   );
 
   
-  iceduino_dummy_slave1_inst: entity iceduino.iceduino_dummy_slave1
-    port map (
-        clk_i       =>  clk_50mhz,
-        rstn_i      =>  external_rstn,  
-        --wishbone-
-        tag_i		=>	reg_tag_o,
-        adr_i		=>	reg_adr_o,
-        dat_i	    =>  reg_dat_o, --write to slave
-        dat_o	    =>  arb_dat_i,
-        we_i        =>  reg_we_o,
-        sel_i		=>	reg_sel_o,
-        stb_i		=>	reg_stb_o,
-        cyc_i       =>  reg_cyc_o,
-        lock_i      =>  reg_lock_o,
-        ack_o       =>  arb_ack_i,
-        err_o       =>  arb_err_i   
-    );
+	iceduino_gpio_inst: entity iceduino.iceduino_gpio
+	port map (
+		-- host access --
+		clk_i  =>     clk_12mhz, -- global clock line
+		rstn_i 	=>    external_rstn, -- global reset line, low-active
+		--wishbone-
+		tag_i		=>	reg_tag_o,
+		adr_i		=>	reg_adr_o,
+		dat_i	    =>  reg_dat_o, --write to slave
+		dat_o	    =>  arb_dat_i,
+		we_i        =>  reg_we_o,
+		sel_i		=>	reg_sel_o,
+		stb_i		=>	reg_stb_o,
+		cyc_i       =>  reg_cyc_o,
+		lock_i      =>  reg_lock_o,
+		ack_o       =>  arb_ack_i,
+		err_o       =>  arb_err_i, 
+		-- parallel io --
+		gpio_o       => con_led,
+		gpio_i       => (others => 'U')   
+	);
 	
 
     
-  led <= con_gpio(7 downto 0);
+  led <= con_led(7 downto 0);
 
   flash_csn <= con_spi_csn(0);
     
