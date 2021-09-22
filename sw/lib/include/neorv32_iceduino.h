@@ -47,7 +47,7 @@
  * @name GPIO_Iceduino
  **************************************************************************/
 /** GPIO base address */
-#define ICEDUINO_GPIO_BASE (0xA0000000UL) 
+#define ICEDUINO_GPIO_BASE (0xFFFF8000UL) 
 /** GPIO address space size in bytes */
 #define ICEDUINO_GPIO_SIZE (2x4) 
 /** GPIO parallel input port 32-bit (r/-) */

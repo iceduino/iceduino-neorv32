@@ -60,7 +60,11 @@ PCF_SRC := \
   $(ICEDUINO_HOME)/osflow/constraint/iceduino.pcf
 
 ICEDUINO_SRC := \
-  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_gpio.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_led.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_switch.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_button.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_gpio_header.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_pmod.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/neorv32_iceduino_top.vhd 
   
 DESIGN_NAME := iceduino
