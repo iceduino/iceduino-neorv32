@@ -8,17 +8,13 @@ entity iceduino_led is
     clk_i  : in  std_ulogic; -- global clock line
     rstn_i 	: in  std_ulogic; -- global reset line, low-active
     --wishbone-
-    tag_i  	: in  std_ulogic_vector(2 downto 0);
     adr_i 	: in  std_ulogic_vector(31 downto 0); 
     dat_i	: in  std_ulogic_vector(31 downto 0); --write to slave
     dat_o	: out std_ulogic_vector(31 downto 0);       
     we_i  	: in  std_ulogic;
-    sel_i  	: in  std_ulogic_vector(3 downto 0);
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
-    lock_i  : in  std_ulogic;
     ack_o  	: out  std_ulogic;
-    err_o  	: out  std_ulogic; 
     -- parallel io --
     led_o : out std_ulogic_vector(7 downto 0)
   );
@@ -42,7 +38,6 @@ begin
     if rising_edge(clk_i) then    
       -- handshake
       ack_o <= module_active;
-      err_o <= '0'; 
       -- write access
 	  dat_o <= (others => 'Z');
       if ((module_active and we_i) = '1') then

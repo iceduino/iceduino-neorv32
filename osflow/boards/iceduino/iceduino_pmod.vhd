@@ -8,17 +8,13 @@ entity iceduino_pmod is
     clk_i  : in  std_ulogic; -- global clock line
     rstn_i 	: in  std_ulogic; -- global reset line, low-active
     --wishbone
-    tag_i  	: in  std_ulogic_vector(2 downto 0);
     adr_i 	: in  std_ulogic_vector(31 downto 0); 
     dat_i	: in  std_ulogic_vector(31 downto 0); --write to slave
     dat_o	: out std_ulogic_vector(31 downto 0);       
     we_i  	: in  std_ulogic;
-    sel_i  	: in  std_ulogic_vector(3 downto 0);
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
-    lock_i  : in  std_ulogic;
     ack_o  	: out  std_ulogic;
-    err_o  	: out  std_ulogic; 
     -- io 
     pmod_en : out  std_ulogic;
     pmod_io : inout std_logic_vector(7 downto 0) 
@@ -48,8 +44,7 @@ begin
   begin
     if rising_edge(clk_i) then
 	   -- handshake
-      ack_o <= module_active;
-      err_o <= '0';      
+      ack_o <= module_active;        
 
       if ((module_active and we_i) = '1') then
         if (module_addr(3 downto 0) = x"8") then

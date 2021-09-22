@@ -105,18 +105,14 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
 	signal external_rstn : std_ulogic;
 	
     -- wishbone: shared with all slaves
-    signal reg_tag_o       : std_ulogic_vector(02 downto 0):=(others => '0'); -- request tag
     signal reg_adr_o       : std_ulogic_vector(31 downto 0):=(others => '0'); -- address	
     signal reg_dat_o       : std_ulogic_vector(31 downto 0):=(others => '0'); -- write data
     signal reg_we_o        : std_ulogic:= '0'; -- read/write
-    signal reg_sel_o       : std_ulogic_vector(03 downto 0):=(others => '0'); -- byte enable
     signal reg_stb_o       : std_ulogic := '0'; -- strobe
     signal reg_cyc_o       : std_ulogic := '0'; -- valid cycle
-    signal reg_lock_o      : std_ulogic := '0'; -- exclusive access request
     -- wishbone: arbiter for slave outputs
     signal arb_dat_i       : std_logic_vector(31 downto 0):=(others => 'U'); -- read data
     signal arb_ack_i       : std_logic := 'L'; -- transfer acknowledge
-    signal arb_err_i       : std_logic:= 'L'; -- transfer error
 	
 	-- internal IO connection --
     signal con_gpio : std_ulogic_vector(63 downto 0);
@@ -242,17 +238,17 @@ begin
 		jtag_tms_i     => 'U', -- mode select
 
 		-- Wishbone bus interface (available if MEM_EXT_EN = true) --
-		wb_tag_o       => reg_tag_o, -- request tag
+		wb_tag_o       => open, -- request tag
 		wb_adr_o       => reg_adr_o, -- address
 		wb_dat_i       => arb_dat_i, -- read data
 		wb_dat_o       => reg_dat_o, -- write data
 		wb_we_o        => reg_we_o, -- read/write
-		wb_sel_o       => reg_sel_o, -- byte enable
+		wb_sel_o       => open, -- byte enable
 		wb_stb_o       => reg_stb_o, -- strobe
 		wb_cyc_o       => reg_cyc_o, -- valid cycle
-		wb_lock_o      => reg_lock_o, -- exclusive access request
+		wb_lock_o      => open, -- exclusive access request
 		wb_ack_i       => arb_ack_i, -- transfer acknowledge
-		wb_err_i       => arb_err_i, -- transfer error
+		wb_err_i       => '0', -- transfer error
 
 
 		-- Advanced memory control signals (available if MEM_EXT_EN = true) --
@@ -326,19 +322,14 @@ begin
         clk_i  		=>  clk_50mhz,
         rstn_i 		=>  external_rstn,
         --wishbone-
-        tag_i		=>	reg_tag_o,
         adr_i		=>	reg_adr_o,
         dat_i	    =>  reg_dat_o, --write to slave
         dat_o	    =>  arb_dat_i,
         we_i        =>  reg_we_o,
-        sel_i		=>	reg_sel_o,
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
-        lock_i      =>  reg_lock_o,
         ack_o       =>  arb_ack_i,
-        err_o       =>  arb_err_i,
-        led_o       =>  con_led --io
-       
+        led_o       =>  con_led --io       
     );
     
 	-- module instance switch --
@@ -346,18 +337,13 @@ begin
 --     port map (
 --         clk_i  		=>  clk_50mhz,
 --         rstn_i 		=>  external_rstn,
---         wishbone
---         tag_i		=>	reg_tag_o,
 --         adr_i		=>	reg_adr_o,
 --         dat_i	    =>  reg_dat_o, --write to slave
 --         dat_o	    =>  arb_dat_i,
 --         we_i        =>  reg_we_o,
---         sel_i		=>	reg_sel_o,
 --         stb_i		=>	reg_stb_o,
 --         cyc_i       =>  reg_cyc_o,
---         lock_i      =>  reg_lock_o,
 --         ack_o       =>  arb_ack_i,
---         err_o       =>  arb_err_i, 
 --         switch_i    =>  sw --io
 -- 
 --     );
@@ -367,18 +353,13 @@ begin
 --     port map (
 --         clk_i  		=>  clk_50mhz,
 --         rstn_i 		=>  external_rstn,
---         wishbone
---         tag_i		=>	reg_tag_o,
 --         adr_i		=>	reg_adr_o,
 --         dat_i	    =>  reg_dat_o, --write to slave
 --         dat_o	    =>  arb_dat_i,
 --         we_i        =>  reg_we_o,
---         sel_i		=>	reg_sel_o,
 --         stb_i		=>	reg_stb_o,
 --         cyc_i       =>  reg_cyc_o,
---         lock_i      =>  reg_lock_o,
 --         ack_o       =>  arb_ack_i,
---         err_o       =>  arb_err_i,  
 --         button_i    => 	btn --io
 --  
 --     );
@@ -388,18 +369,13 @@ begin
 --     port map (
 --         clk_i  		=>  clk_50mhz,
 --         rstn_i 		=>  external_rstn,
---         wishbone-
---         tag_i		=>	reg_tag_o,
 --         adr_i		=>	reg_adr_o,
 --         dat_i	    =>  reg_dat_o, --write to slave
 --         dat_o	    =>  arb_dat_i,
 --         we_i        =>  reg_we_o,
---         sel_i		=>	reg_sel_o,
 --         stb_i		=>	reg_stb_o,
 --         cyc_i       =>  reg_cyc_o,
---         lock_i      =>  reg_lock_o,
 --         ack_o       =>  arb_ack_i,
---         err_o       =>  arb_err_i,
 --         pmod_en     =>  con_pmod_en,                    
 --         pmod_io     => 	con_pmod1 --io 
 --     );
@@ -409,18 +385,13 @@ begin
 --     port map (
 --         clk_i  		=>  clk_50mhz,
 --         rstn_i 		=>  external_rstn,
---       --wishbone-
---         tag_i		=>	reg_tag_o,
 --         adr_i		=>	reg_adr_o,
 --         dat_i	    =>  reg_dat_o, --write to slave
 --         dat_o	    =>  arb_dat_i,
 --         we_i        =>  reg_we_o,
---         sel_i		=>	reg_sel_o,
 --         stb_i	   =>	reg_stb_o,
 --         cyc_i       =>  reg_cyc_o,
---         lock_i      =>  reg_lock_o,
 --         ack_o       =>  arb_ack_i,
---         err_o       =>  arb_err_i,
 --         pmod_en     =>  con_pmod_en,
 --         pmod_io     => con_pmod2 --io   
 --     );
@@ -430,18 +401,13 @@ begin
 --     port map (
 --         clk_i  		=>  clk_50mhz,
 --         rstn_i 		=>  external_rstn,
-        --wishbone-
---         tag_i		=>	reg_tag_o,
 --         adr_i		=>	reg_adr_o,
 --         dat_i	    =>  reg_dat_o, --write to slave
 --         dat_o	    =>  arb_dat_i,
 --         we_i        =>  reg_we_o,
---         sel_i		=>	reg_sel_o,
 --         stb_i		=>	reg_stb_o,
 --         cyc_i       =>  reg_cyc_o,
---         lock_i      =>  reg_lock_o,
 --         ack_o       =>  arb_ack_i,
---         err_o       =>  arb_err_i, 
 --         pmod_en     =>  con_pmod_en,
 --         pmod_io     => con_pmod3 --io      
 --     );
@@ -451,18 +417,13 @@ begin
 --     port map (
 --         clk_i  		=>  clk_50mhz,
 --         rstn_i 		=>  external_rstn,
---         wishbone-
---         tag_i		=>	reg_tag_o,
 --         adr_i		=>	reg_adr_o,
 --         dat_i	    =>  reg_dat_o, --write to slave
 --         dat_o	    =>  arb_dat_i,
 --         we_i        =>  reg_we_o,
---         sel_i		=>	reg_sel_o,
 --         stb_i		=>	reg_stb_o,
 --         cyc_i       =>  reg_cyc_o,
---         lock_i      =>  reg_lock_o,
 --         ack_o       =>  arb_ack_i,
---         err_o       =>  arb_err_i,         
 --         io       	=>  con_io --io
 --     );
 	
