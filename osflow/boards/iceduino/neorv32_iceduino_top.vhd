@@ -53,31 +53,32 @@ entity neorv32_iceduino_top is
 
     -- Simple I/Os --
     led : out std_ulogic_vector(7 downto 0);
-    -- btn : in std_ulogic_vector(4 downto 0);
-    -- sw  : in std_ulogic_vector(1 downto 0);
+    led : out std_ulogic_vector(7 downto 0);
+    btn : in std_ulogic_vector(4 downto 0);
+    sw  : in std_ulogic_vector(1 downto 0);
 
     -- -- PMOD --
-    -- pmod_pwr_en : out std_ulogic;
-    -- pmod1 : inout std_logic_vector(7 downto 0);
-    -- pmod2 : inout std_logic_vector(7 downto 0);
-    -- pmod3 : inout std_logic_vector(7 downto 0);
+    pmod_pwr_en : out std_ulogic;
+    pmod1 : inout std_logic_vector(7 downto 0);
+    pmod2 : inout std_logic_vector(7 downto 0);
+    pmod3 : inout std_logic_vector(7 downto 0);
 
     -- -- Arduino Header --
     -- oe_j5 : out std_ulogic;
     -- oe_j6 : out std_ulogic;
-    -- io_d : inout std_ulogic_vector(9 downto 2);
-    -- io_tx : out std_ulogic;
-    -- io_rx : in std_ulogic;
-    -- io_scl : out std_ulogic;
-    -- io_sda : inout std_ulogic;
-    -- io_miso : in std_ulogic;
-    -- io_mosi : out std_ulogic;
-    -- io_sck : out std_ulogic;
-    -- io_ss : out std_ulogic;
+    io_d : inout std_ulogic_vector(9 downto 2);
+    io_tx : out std_ulogic;
+    io_rx : in std_ulogic;
+    io_scl : out std_ulogic;
+    io_sda : inout std_ulogic;
+    io_miso : in std_ulogic;
+    io_mosi : out std_ulogic;
+    io_sck : out std_ulogic;
+    io_ss : out std_ulogic;
 
     -- -- ADC --
-    -- adc_scl : out std_ulogic;
-    -- adc_sda : inout std_ulogic;
+    adc_scl : out std_ulogic;
+    adc_sda : inout std_ulogic;
 
     -- USB - UART/RS232
     uart_tx : out std_ulogic;
@@ -113,6 +114,17 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
     -- wishbone: arbiter for slave outputs
     signal arb_dat_i       : std_logic_vector(31 downto 0):=(others => 'U'); -- read data
     signal arb_ack_i       : std_logic := 'L'; -- transfer acknowledge
+	signal led_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
+	signal sw_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
+	signal btn_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal pmod1_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
+	signal pmod2_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal pmod3_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
+	signal gpio_header_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal arduino_i2c_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal arduino_spi_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal arduino_uart_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal adc_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
 	
 	-- internal IO connection --
     signal con_gpio : std_ulogic_vector(63 downto 0);
@@ -121,10 +133,18 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
     -- external IO connection --
     signal con_led : std_ulogic_vector(7 downto 0);   
     --signal con_pmod_en : std_ulogic; 
-    --signal con_pmod1 : std_logic_vector(7 downto 0);   
-    --signal con_pmod2 : std_logic_vector(7 downto 0);   
-    --signal con_pmod3 : std_logic_vector(7 downto 0);
-    --signal con_io : std_logic_vector(7 downto 0);
+    signal con_pmod1 : std_logic_vector(7 downto 0);   
+    signal con_pmod2 : std_logic_vector(7 downto 0);   
+    signal con_pmod3 : std_logic_vector(7 downto 0);
+    signal con_io : std_logic_vector(7 downto 0);
+    signal con_tx : std_logic;
+    signal con_scl : std_logic;
+    signal con_sda : std_logic;
+    signal con_mosi : std_logic;
+    signal con_sck : std_logic;
+    signal con_ss : std_logic;    
+    signal con_adc_scl : std_logic;
+    signal con_adc_sda : std_logic;
 
 begin
 
@@ -138,6 +158,36 @@ begin
 		else
 		  external_rstn <= '1';
 		end if;
+		
+		--arbiter for data slave -> master
+        if(reg_adr_o(31 downto 8) = x"FFFF80") then
+            case reg_adr_o(7 downto 0) is
+                when x"00" =>
+                        arb_dat_i <= led_dat_i;						
+                when x"01" =>
+                        arb_dat_i <= sw_dat_i;
+                when x"02" =>
+                        arb_dat_i <= btn_dat_i;	
+                when x"03" =>
+                        arb_dat_i <= pmod1_dat_i;
+                when x"04" =>
+                        arb_dat_i <= pmod2_dat_i;
+                when x"05" =>
+                        arb_dat_i <= pmod3_dat_i;
+                when x"06" =>
+                        arb_dat_i <= gpio_header_dat_i;
+                when x"07" =>
+                        arb_dat_i <= arduino_i2c_dat_i;	
+                when x"08" =>
+                        arb_dat_i <= arduino_spi_dat_i;	
+                when x"09" =>
+                        arb_dat_i <= arduino_uart_dat_i;	
+                when x"10" =>
+                        arb_dat_i <= adc_dat_i;	
+                when others =>
+                        arb_dat_i <= (others => 'L');						
+            end case;
+        end if;
 	  end if;
 	end process;
 
@@ -324,7 +374,7 @@ begin
         --wishbone-
         adr_i		=>	reg_adr_o,
         dat_i	    =>  reg_dat_o, --write to slave
-        dat_o	    =>  arb_dat_i,
+        dat_o	    =>  led_dat_i,
         we_i        =>  reg_we_o,
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
@@ -333,109 +383,191 @@ begin
     );
     
 	-- module instance switch --
---     iceduino_switch_inst: entity iceduino.iceduino_switch
---     port map (
---         clk_i  		=>  clk_50mhz,
---         rstn_i 		=>  external_rstn,
---         adr_i		=>	reg_adr_o,
---         dat_i	    =>  reg_dat_o, --write to slave
---         dat_o	    =>  arb_dat_i,
---         we_i        =>  reg_we_o,
---         stb_i		=>	reg_stb_o,
---         cyc_i       =>  reg_cyc_o,
---         ack_o       =>  arb_ack_i,
---         switch_i    =>  sw --io
--- 
---     );
+    iceduino_switch_inst: entity iceduino.iceduino_switch
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  sw_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        switch_i    =>  sw --io
+
+    );
     
 	-- module instance button --
---     iceduino_button_inst: entity iceduino.iceduino_button
---     port map (
---         clk_i  		=>  clk_50mhz,
---         rstn_i 		=>  external_rstn,
---         adr_i		=>	reg_adr_o,
---         dat_i	    =>  reg_dat_o, --write to slave
---         dat_o	    =>  arb_dat_i,
---         we_i        =>  reg_we_o,
---         stb_i		=>	reg_stb_o,
---         cyc_i       =>  reg_cyc_o,
---         ack_o       =>  arb_ack_i,
---         button_i    => 	btn --io
---  
---     );
+    iceduino_button_inst: entity iceduino.iceduino_button
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  btn_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        button_i    => 	btn --io
+    );
     
 	-- module instance pmod1 --
---     iceduino_gpio_pmod1_inst: entity iceduino.iceduino_pmod
---     port map (
---         clk_i  		=>  clk_50mhz,
---         rstn_i 		=>  external_rstn,
---         adr_i		=>	reg_adr_o,
---         dat_i	    =>  reg_dat_o, --write to slave
---         dat_o	    =>  arb_dat_i,
---         we_i        =>  reg_we_o,
---         stb_i		=>	reg_stb_o,
---         cyc_i       =>  reg_cyc_o,
---         ack_o       =>  arb_ack_i,
---         pmod_en     =>  con_pmod_en,                    
---         pmod_io     => 	con_pmod1 --io 
---     );
+    iceduino_gpio_pmod1_inst: entity iceduino.iceduino_pmod
+    generic map (
+        pmod_instance_addr_i  => x"FFFF80FF",
+        pmod_instance_addr_o  => x"FFFF80FF"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  pmod1_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,                           
+        pmod_io     => 	con_pmod1 --io 
+    );
     
 	-- module instance pmod2 --
---     iceduino_gpio_pmod2_inst: entity iceduino.iceduino_pmod
---     port map (
---         clk_i  		=>  clk_50mhz,
---         rstn_i 		=>  external_rstn,
---         adr_i		=>	reg_adr_o,
---         dat_i	    =>  reg_dat_o, --write to slave
---         dat_o	    =>  arb_dat_i,
---         we_i        =>  reg_we_o,
---         stb_i	   =>	reg_stb_o,
---         cyc_i       =>  reg_cyc_o,
---         ack_o       =>  arb_ack_i,
---         pmod_en     =>  con_pmod_en,
---         pmod_io     => con_pmod2 --io   
---     );
+    iceduino_gpio_pmod2_inst: entity iceduino.iceduino_pmod
+    generic map (
+        pmod_instance_addr_i  => x"FFFF80FF",
+        pmod_instance_addr_o  => x"FFFF80FF"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  pmod2_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,                           
+        pmod_io     => 	con_pmod2 --io 
+    );
     
 	-- module instance pmod3 --
---     iceduino_gpio_pmod3_inst: entity iceduino.iceduino_pmod
---     port map (
---         clk_i  		=>  clk_50mhz,
---         rstn_i 		=>  external_rstn,
---         adr_i		=>	reg_adr_o,
---         dat_i	    =>  reg_dat_o, --write to slave
---         dat_o	    =>  arb_dat_i,
---         we_i        =>  reg_we_o,
---         stb_i		=>	reg_stb_o,
---         cyc_i       =>  reg_cyc_o,
---         ack_o       =>  arb_ack_i,
---         pmod_en     =>  con_pmod_en,
---         pmod_io     => con_pmod3 --io      
---     );
+    iceduino_gpio_pmod3_inst: entity iceduino.iceduino_pmod
+    generic map (
+        pmod_instance_addr_i  => x"FFFF80FF",
+        pmod_instance_addr_o  => x"FFFF80FF"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  pmod3_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,                           
+        pmod_io     => 	con_pmod3 --io 
+    );
     
-	-- module instance arduino header gpio --
---     iceduino_gpio_header_inst: entity iceduino.iceduino_gpio_header
---     port map (
---         clk_i  		=>  clk_50mhz,
---         rstn_i 		=>  external_rstn,
---         adr_i		=>	reg_adr_o,
---         dat_i	    =>  reg_dat_o, --write to slave
---         dat_o	    =>  arb_dat_i,
---         we_i        =>  reg_we_o,
---         stb_i		=>	reg_stb_o,
---         cyc_i       =>  reg_cyc_o,
---         ack_o       =>  arb_ack_i,
---         io       	=>  con_io --io
---     );
+	-- module instance arduino gpio --
+    iceduino_arduino_gpio_inst: entity iceduino.iceduino_arduino_gpio
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  gpio_header_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        io       	=>  con_io --io
+    );
+    
+    -- module instance arduino uart --
+    iceduino_arduino_uart_inst: entity iceduino.iceduino_arduino_uart
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  arduino_uart_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        tx_o       	=>  con_tx,
+        rx_i       	=>  io_rx
+    );
+    
+    -- module instance arduino spi --
+    iceduino_arduino_spi_inst: entity iceduino.iceduino_arduino_spi
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  arduino_spi_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        miso_i      =>  io_miso,
+        mosi_o      =>  con_mosi,
+        sck_o       =>  con_sck,
+        ss_o        =>  con_ss
+    );
+    
+    -- module instance arduino i2c --
+    iceduino_arduino_i2c_inst: entity iceduino.iceduino_arduino_i2c
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  arduino_i2c_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        scl_o       =>  con_scl,
+        sda         =>  con_sda       
+    );
+    
+    -- module instance adc --
+    iceduino_arduino_adc_inst: entity iceduino.iceduino_arduino_adc
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	reg_adr_o,
+        dat_i	    =>  reg_dat_o, --write to slave
+        dat_o	    =>  adc_dat_i,
+        we_i        =>  reg_we_o,
+        stb_i		=>	reg_stb_o,
+        cyc_i       =>  reg_cyc_o,
+        ack_o       =>  arb_ack_i,
+        scl_o       =>  con_adc_scl,
+        sda         =>  con_adc_sda       
+    );
 	
 	-- outputs internal --
 	flash_csn <= con_spi_csn(0);
 	
 	-- outputs external --	
     led <= con_led;   
-    --pmod_pwr_en <= con_pmod_en;
-    --pmod1 <= con_pmod1;
-    --pmod2 <= con_pmod2;
-    --pmod3 <= con_pmod3;
-    --io_d <= con_io;
+    pmod_pwr_en <= '1';
+    pmod1 <= con_pmod1;
+    pmod2 <= con_pmod2;
+    pmod3 <= con_pmod3;
+    io_d <= con_io;
+    io_tx <= con_tx;
+    io_mosi <= con_mosi;
+    io_sck <= con_sck;
+    io_ss <= con_ss;
+    io_scl <= con_scl;
+    io_sda <= con_sda;
+    adc_scl <= con_adc_scl;
+    adc_sda <= con_adc_sda;
     
 end architecture;

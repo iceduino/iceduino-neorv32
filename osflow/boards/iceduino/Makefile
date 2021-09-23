@@ -63,8 +63,12 @@ ICEDUINO_SRC := \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_led.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_switch.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_button.vhd \
-  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_gpio_header.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_gpio.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_pmod.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_uart.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_spi.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_i2c.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_adc.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/neorv32_iceduino_top.vhd 
   
 DESIGN_NAME := iceduino

@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 
-entity iceduino_gpio_header is
+entity iceduino_arduino_gpio is
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rstn_i 	: in  std_ulogic; -- global reset line, low-active
@@ -19,7 +19,7 @@ entity iceduino_gpio_header is
   );
 end entity;
 
-architecture iceduino_gpio_header_rtl of iceduino_gpio_header is
+architecture iceduino_arduino_gpio_rtl of iceduino_arduino_gpio is
 
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
@@ -31,14 +31,18 @@ architecture iceduino_gpio_header_rtl of iceduino_gpio_header is
 begin
 
   -- module active
-  module_active <= '1' when (((adr_i = gpio_addr_i) or (adr_i = gpio_addr_o)) and (cyc_i = '1' and stb_i = '1')) else 'Z';
+  module_active <= '1' when (((adr_i = gpio_addr_i) or (adr_i = gpio_addr_o)) and (cyc_i = '1' and stb_i = '1')) else '0';
   module_addr   <= adr_i;
 
   rw_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
        -- handshake
-      ack_o <= module_active;
+      if (module_active = '1') then
+        ack_o <= '1';
+      else   
+        ack_o <= 'Z';
+      end if;
      
       
       -- write access --
