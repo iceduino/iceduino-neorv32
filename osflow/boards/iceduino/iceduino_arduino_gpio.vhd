@@ -23,8 +23,8 @@ architecture iceduino_arduino_gpio_rtl of iceduino_arduino_gpio is
 
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
-  constant gpio_addr_o : std_ulogic_vector(31 downto 0) := x"FFFF8010"; 
-  constant gpio_addr_i : std_ulogic_vector(31 downto 0) := x"FFFF8018"; 
+  constant gpio_addr_o : std_ulogic_vector(31 downto 0) := x"FFFF8040"; 
+  constant gpio_addr_i : std_ulogic_vector(31 downto 0) := x"FFFF8048"; 
   signal din  : std_logic_vector(7 downto 0); 
   signal dout : std_logic_vector(7 downto 0); 
 

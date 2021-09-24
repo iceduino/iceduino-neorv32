@@ -52,8 +52,7 @@ entity neorv32_iceduino_top is
     clk_50mhz : in  std_ulogic;
 
     -- Simple I/Os --
-    led : out std_ulogic_vector(7 downto 0);
-    led : out std_ulogic_vector(7 downto 0);
+    led : out std_ulogic_vector(7 downto 0);    
     btn : in std_ulogic_vector(4 downto 0);
     sw  : in std_ulogic_vector(1 downto 0);
 
@@ -164,25 +163,33 @@ begin
             case reg_adr_o(7 downto 0) is
                 when x"00" =>
                         arb_dat_i <= led_dat_i;						
-                when x"01" =>
-                        arb_dat_i <= sw_dat_i;
-                when x"02" =>
-                        arb_dat_i <= btn_dat_i;	
-                when x"03" =>
-                        arb_dat_i <= pmod1_dat_i;
-                when x"04" =>
-                        arb_dat_i <= pmod2_dat_i;
-                when x"05" =>
-                        arb_dat_i <= pmod3_dat_i;
-                when x"06" =>
-                        arb_dat_i <= gpio_header_dat_i;
-                when x"07" =>
-                        arb_dat_i <= arduino_i2c_dat_i;	
                 when x"08" =>
-                        arb_dat_i <= arduino_spi_dat_i;	
-                when x"09" =>
-                        arb_dat_i <= arduino_uart_dat_i;	
+                        arb_dat_i <= sw_dat_i;
+                when x"0A" =>
+                        arb_dat_i <= btn_dat_i;	
                 when x"10" =>
+                        arb_dat_i <= pmod1_dat_i;
+				when x"18" =>
+                        arb_dat_i <= pmod1_dat_i;		
+                when x"20" =>
+                        arb_dat_i <= pmod2_dat_i;
+				when x"28" =>
+                        arb_dat_i <= pmod2_dat_i;		
+                when x"30" =>
+                        arb_dat_i <= pmod3_dat_i;
+				when x"38" =>
+                        arb_dat_i <= pmod3_dat_i;		
+                when x"40" =>
+                        arb_dat_i <= gpio_header_dat_i;
+				when x"48" =>
+                        arb_dat_i <= gpio_header_dat_i;		
+                when x"50" =>
+                        arb_dat_i <= arduino_i2c_dat_i;	
+                when x"51" =>
+                        arb_dat_i <= arduino_spi_dat_i;	
+                when x"52" =>
+                        arb_dat_i <= arduino_uart_dat_i;	
+                when x"58" =>
                         arb_dat_i <= adc_dat_i;	
                 when others =>
                         arb_dat_i <= (others => 'L');						
@@ -416,8 +423,8 @@ begin
 	-- module instance pmod1 --
     iceduino_gpio_pmod1_inst: entity iceduino.iceduino_pmod
     generic map (
-        pmod_instance_addr_i  => x"FFFF80FF",
-        pmod_instance_addr_o  => x"FFFF80FF"
+        pmod_instance_addr_i  => x"FFFF8018",
+        pmod_instance_addr_o  => x"FFFF8010"
     )
     port map (
         clk_i  		=>  clk_50mhz,
@@ -435,8 +442,8 @@ begin
 	-- module instance pmod2 --
     iceduino_gpio_pmod2_inst: entity iceduino.iceduino_pmod
     generic map (
-        pmod_instance_addr_i  => x"FFFF80FF",
-        pmod_instance_addr_o  => x"FFFF80FF"
+        pmod_instance_addr_i  => x"FFFF8028",
+        pmod_instance_addr_o  => x"FFFF8020"
     )
     port map (
         clk_i  		=>  clk_50mhz,
@@ -454,8 +461,8 @@ begin
 	-- module instance pmod3 --
     iceduino_gpio_pmod3_inst: entity iceduino.iceduino_pmod
     generic map (
-        pmod_instance_addr_i  => x"FFFF80FF",
-        pmod_instance_addr_o  => x"FFFF80FF"
+        pmod_instance_addr_i  => x"FFFF8038",
+        pmod_instance_addr_o  => x"FFFF8030"
     )
     port map (
         clk_i  		=>  clk_50mhz,

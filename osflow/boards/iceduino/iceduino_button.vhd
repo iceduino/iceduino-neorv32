@@ -25,18 +25,22 @@ architecture iceduino_button_rtl of iceduino_button is
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
   signal reg_button  : std_ulogic_vector(4 downto 0);  
-  constant button_addr : std_ulogic_vector(31 downto 0) := x"FFFF800B"; 
+  constant button_addr : std_ulogic_vector(31 downto 0) := x"FFFF800A"; 
 
 begin
   -- module active
-  module_active <= '1' when ((adr_i = button_addr) and (cyc_i = '1' and stb_i = '1')) else 'Z';
+  module_active <= '1' when ((adr_i = button_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
   module_addr   <= adr_i;
 
   r_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
 	  -- handshake
-      ack_o <= module_active;
+      if (module_active = '1') then
+        ack_o <= '1';
+      else   
+        ack_o <= 'Z';
+      end if;
 	  -- read access	
       reg_button <= button_i(4 downto 0); 	  
       dat_o <= (others => 'Z');

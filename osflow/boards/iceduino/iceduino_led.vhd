@@ -30,16 +30,20 @@ architecture iceduino_led_rtl of iceduino_led  is
 
 begin
   -- module active
-  module_active <= '1' when ((adr_i = led_addr) and (cyc_i = '1' and stb_i = '1')) else 'Z';
+  module_active <= '1' when ((adr_i = led_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
   module_addr   <= adr_i;
   
   w_access: process(clk_i)
   begin
     if rising_edge(clk_i) then    
       -- handshake
-      ack_o <= module_active;
+      if (module_active = '1') then
+        ack_o <= '1';
+      else   
+        ack_o <= 'Z';
+      end if;
       -- write access
-	  dat_o <= (others => 'Z');
+	  dat_o <= (others => 'L');
       if ((module_active and we_i) = '1') then
         if (module_addr = led_addr) then
           reg_led <= dat_i(7 downto 0);          

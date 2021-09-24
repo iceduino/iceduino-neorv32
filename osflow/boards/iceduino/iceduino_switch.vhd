@@ -25,21 +25,25 @@ architecture iceduino_switch_rtl of iceduino_switch is
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
   signal reg_switch  : std_ulogic_vector(1 downto 0);  
-  constant switch_addr : std_ulogic_vector(31 downto 0) := x"FFFF8009";
+  constant switch_addr : std_ulogic_vector(31 downto 0) := x"FFFF8008";
 
 begin
   -- module active
-  module_active <= '1' when ((adr_i = switch_addr) and (cyc_i = '1' and stb_i = '1')) else 'Z';
+  module_active <= '1' when ((adr_i = switch_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
   module_addr   <= adr_i;
 
   r_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
 	  -- handshake
-      ack_o <= module_active;
+      if (module_active = '1') then
+        ack_o <= '1';
+      else   
+        ack_o <= 'Z';
+      end if;
 	  -- read access
       reg_switch <= switch_i; 
-      dat_o <= (others => 'Z');
+      dat_o <= (others => 'L');
       if ((module_active and (not we_i)) = '1') then
         if (module_addr = switch_addr) then
             dat_o(31 downto 2) <= (others => '0');
