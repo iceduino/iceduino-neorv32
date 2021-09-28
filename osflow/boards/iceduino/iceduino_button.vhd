@@ -25,7 +25,7 @@ architecture iceduino_button_rtl of iceduino_button is
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
   signal reg_button  : std_ulogic_vector(4 downto 0);  
-  constant button_addr : std_ulogic_vector(31 downto 0) := x"FFFF800A"; 
+  constant button_addr : std_ulogic_vector(31 downto 0) := x"FFFF8010"; 
 
 begin
   -- module active

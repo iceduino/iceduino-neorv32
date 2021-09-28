@@ -27,7 +27,7 @@ architecture iceduino_arduino_i2c_rtl of iceduino_arduino_i2c is
 
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
-  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8050"; 
+  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8068"; 
 
 
 begin

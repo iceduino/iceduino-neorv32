@@ -27,7 +27,7 @@ architecture iceduino_arduino_adc_rtl of iceduino_arduino_adc is
 
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
-  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8058"; 
+  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8070"; 
 
 
 begin

@@ -27,7 +27,7 @@ architecture iceduino_arduino_uart_rtl of iceduino_arduino_uart is
 
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
-  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8052"; 
+  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8058"; 
 
 
 begin

@@ -119,7 +119,7 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
 	signal pmod1_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
 	signal pmod2_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
 	signal pmod3_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
-	signal gpio_header_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
+	signal arduino_gpio_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
 	signal arduino_i2c_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
 	signal arduino_spi_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
 	signal arduino_uart_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
@@ -165,31 +165,31 @@ begin
                         arb_dat_i <= led_dat_i;						
                 when x"08" =>
                         arb_dat_i <= sw_dat_i;
-                when x"0A" =>
-                        arb_dat_i <= btn_dat_i;	
                 when x"10" =>
+                        arb_dat_i <= btn_dat_i;	
+                when x"18" =>
                         arb_dat_i <= pmod1_dat_i;
-				when x"18" =>
+				when x"20" =>
                         arb_dat_i <= pmod1_dat_i;		
-                when x"20" =>
+                when x"28" =>
                         arb_dat_i <= pmod2_dat_i;
-				when x"28" =>
+				when x"30" =>
                         arb_dat_i <= pmod2_dat_i;		
-                when x"30" =>
+                when x"38" =>
                         arb_dat_i <= pmod3_dat_i;
-				when x"38" =>
+				when x"40" =>
                         arb_dat_i <= pmod3_dat_i;		
-                when x"40" =>
-                        arb_dat_i <= gpio_header_dat_i;
-				when x"48" =>
-                        arb_dat_i <= gpio_header_dat_i;		
-                when x"50" =>
-                        arb_dat_i <= arduino_i2c_dat_i;	
-                when x"51" =>
-                        arb_dat_i <= arduino_spi_dat_i;	
-                when x"52" =>
-                        arb_dat_i <= arduino_uart_dat_i;	
+                when x"48" =>
+                        arb_dat_i <= arduino_gpio_dat_i;
+				when x"50" =>
+                        arb_dat_i <= arduino_gpio_dat_i;		
                 when x"58" =>
+                        arb_dat_i <= arduino_uart_dat_i;	
+                when x"60" =>
+                        arb_dat_i <= arduino_spi_dat_i;	
+                when x"68" =>
+                        arb_dat_i <= arduino_i2c_dat_i;	
+                when x"70" =>
                         arb_dat_i <= adc_dat_i;	
                 when others =>
                         arb_dat_i <= (others => 'L');						
@@ -424,7 +424,7 @@ begin
     iceduino_gpio_pmod1_inst: entity iceduino.iceduino_pmod
     generic map (
         pmod_instance_addr_i  => x"FFFF8018",
-        pmod_instance_addr_o  => x"FFFF8010"
+        pmod_instance_addr_o  => x"FFFF8020"
     )
     port map (
         clk_i  		=>  clk_50mhz,
@@ -443,7 +443,7 @@ begin
     iceduino_gpio_pmod2_inst: entity iceduino.iceduino_pmod
     generic map (
         pmod_instance_addr_i  => x"FFFF8028",
-        pmod_instance_addr_o  => x"FFFF8020"
+        pmod_instance_addr_o  => x"FFFF8030"
     )
     port map (
         clk_i  		=>  clk_50mhz,
@@ -462,7 +462,7 @@ begin
     iceduino_gpio_pmod3_inst: entity iceduino.iceduino_pmod
     generic map (
         pmod_instance_addr_i  => x"FFFF8038",
-        pmod_instance_addr_o  => x"FFFF8030"
+        pmod_instance_addr_o  => x"FFFF8040"
     )
     port map (
         clk_i  		=>  clk_50mhz,
@@ -484,7 +484,7 @@ begin
         rstn_i 		=>  external_rstn,
         adr_i		=>	reg_adr_o,
         dat_i	    =>  reg_dat_o, --write to slave
-        dat_o	    =>  gpio_header_dat_i,
+        dat_o	    =>  arduino_gpio_dat_i,
         we_i        =>  reg_we_o,
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
