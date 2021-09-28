@@ -1,13 +1,18 @@
 #include "neorv32_iceduino.h"
 
-//set all pins of output 0-31
-void iceduino_gpio_set(int value) {
-  ICEDUINO_GPIO_OUTPUT = (uint32_t) value;
+void iceduino_gpio_set_pin(int pin) {
+  uint8_t mask = (uint8_t)(1 << (pin & 0x7));
+  ICEDUINO_ARD_GPIO_OUTPUT = ICEDUINO_ARD_GPIO_OUTPUT | mask;
 }
 
-//clear output
-void iceduino_gpio_clr() {  
-  ICEDUINO_GPIO_OUTPUT = 0x00000000;
+uint8_t iceduino_gpio_get_pin(int pin) {
+  uint8_t mask = (uint8_t)(1 << (number & 0x7));
+  return ICEDUINO_ARD_GPIO_INPUT & mask; 
+}
+
+void iceduino_gpio_clr_pin(int pin){
+  uint8_t mask = (uint8_t)(1 << (pin & 0x7));
+  ICEDUINO_ARD_GPIO_OUTPUT = ICEDUINO_ARD_GPIO_OUTPUT & ~mask;
 }
 
 
