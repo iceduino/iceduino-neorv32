@@ -18,7 +18,7 @@
 //LED base address
 #define ICEDUINO_LED_BASE (0xFFFF8000UL) 
 //LED output port 8-bit (r/w) */
-#define ICEDUINO_LED (*((volatile uint8_t*) (ICEDUINO_GPIO_BASE)))
+#define ICEDUINO_LED (*((volatile uint8_t*) (ICEDUINO_LED_BASE)))
 
 //SWITCH base address
 #define ICEDUINO_SWITCH_BASE (0xFFFF8008UL) 
