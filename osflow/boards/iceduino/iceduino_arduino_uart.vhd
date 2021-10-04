@@ -18,6 +18,7 @@ entity iceduino_arduino_uart is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     tx_o  	: out  std_ulogic;
     rx_i  	: in  std_ulogic
   );

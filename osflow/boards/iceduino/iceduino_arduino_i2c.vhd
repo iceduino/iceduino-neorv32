@@ -18,6 +18,7 @@ entity iceduino_arduino_i2c is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     scl_o  	: out  std_ulogic;
     sda  	: inout  std_ulogic
   );

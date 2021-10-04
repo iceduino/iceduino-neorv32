@@ -15,6 +15,7 @@ entity iceduino_arduino_gpio is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     io : inout std_logic_vector(7 downto 0)
   );
 end entity;

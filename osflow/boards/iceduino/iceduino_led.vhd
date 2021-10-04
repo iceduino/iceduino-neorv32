@@ -15,6 +15,7 @@ entity iceduino_led is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     -- parallel io --
     led_o : out std_ulogic_vector(7 downto 0)
   );
@@ -37,7 +38,7 @@ begin
 
   -- Access Control -------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  acc_en <= '1' when ((adr_i = gpio_addr_o and (cyc_i = '1' and stb_i = '1')) else '0';
+  acc_en <= '1' when (adr_i = gpio_addr_o and (cyc_i = '1' and stb_i = '1')) else '0';
   addr   <= adr_i;
 
   -- Read/Write Access ----------------------------------------------------------------------

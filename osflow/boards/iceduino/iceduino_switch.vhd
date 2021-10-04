@@ -15,6 +15,7 @@ entity iceduino_switch is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     -- io
     switch_i : in  std_ulogic_vector(1 downto 0)
   );

@@ -19,6 +19,7 @@ entity iceduino_pmod is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     -- io 
     pmod_en : out  std_ulogic;
     pmod_io : inout std_logic_vector(7 downto 0) 

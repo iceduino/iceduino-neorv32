@@ -18,6 +18,7 @@ entity iceduino_arduino_spi is
     stb_i  	: in  std_ulogic;
     cyc_i  	: in  std_ulogic;
     ack_o  	: out  std_ulogic;
+    err_o  	: out  std_ulogic;
     miso_i : in std_ulogic;
     mosi_o : out std_ulogic;
     sck_o : out std_ulogic;

@@ -112,7 +112,8 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
     signal reg_cyc_o       : std_ulogic := '0'; -- valid cycle
     -- wishbone: arbiter for slave outputs
     signal arb_dat_i       : std_logic_vector(31 downto 0):=(others => 'U'); -- read data
-    signal arb_ack_i       : std_logic := 'L'; -- transfer acknowledge
+    signal arb_ack_i       : std_ulogic := '0'; -- transfer acknowledge
+    signal arb_err_i       : std_ulogic := '0'; -- transfer error
 	signal led_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
 	signal sw_dat_i       : std_logic_vector(31 downto 0):=(others => 'L'); 
 	signal btn_dat_i       : std_logic_vector(31 downto 0):=(others => 'L');
@@ -135,6 +136,18 @@ architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
 	signal arduino_spi_ack_i       : std_logic := '0';
 	signal arduino_uart_ack_i       : std_logic := '0';
 	signal adc_ack_i       : std_logic := '0';
+    signal led_err_i       : std_logic := '0';
+	signal sw_err_i       : std_logic := '0';
+	signal btn_err_i       : std_logic := '0';
+	signal pmod1_err_i       : std_logic := '0';
+	signal pmod2_err_i       : std_logic := '0';
+	signal pmod3_err_i       : std_logic := '0';
+	signal arduino_gpio_err_i       : std_logic := '0';
+	signal arduino_i2c_err_i       : std_logic := '0';
+	signal arduino_spi_err_i       : std_logic := '0';
+	signal arduino_uart_err_i       : std_logic := '0';
+	signal adc_err_i       : std_logic := '0';
+    
 	
 	-- internal IO connection --
     signal con_gpio : std_ulogic_vector(63 downto 0);
@@ -175,51 +188,67 @@ begin
                 when x"00" =>
                         arb_dat_i <= led_dat_i;  
                         arb_ack_i <= led_ack_i;
+                        arb_err_i <= led_err_i;
                 when x"08" =>
                         arb_dat_i <= sw_dat_i;
                         arb_ack_i <= sw_ack_i;
+                        arb_err_i <= sw_err_i;
                 when x"10" =>
                         arb_dat_i <= btn_dat_i;	
                         arb_ack_i <= btn_ack_i;
+                        arb_err_i <= btn_err_i;
                 when x"18" =>
                         arb_dat_i <= pmod1_dat_i;
                         arb_ack_i <= pmod1_ack_i;
+                        arb_err_i <= pmod1_err_i;
 				when x"20" =>
                         arb_dat_i <= pmod1_dat_i;
                         arb_ack_i <= pmod1_ack_i;
+                        arb_err_i <= pmod1_err_i;
                 when x"28" =>
                         arb_dat_i <= pmod2_dat_i;
                         arb_ack_i <= pmod2_ack_i;
+                        arb_err_i <= pmod2_err_i;
 				when x"30" =>
                         arb_dat_i <= pmod2_dat_i;
                         arb_ack_i <= pmod2_ack_i;
+                        arb_err_i <= pmod2_err_i;
                 when x"38" =>
                         arb_dat_i <= pmod3_dat_i;
                         arb_ack_i <= pmod3_ack_i;
+                        arb_err_i <= pmod3_err_i;
 				when x"40" =>
                         arb_dat_i <= pmod3_dat_i;
                         arb_ack_i <= pmod3_ack_i;
+                        arb_err_i <= pmod3_err_i;
                 when x"48" =>
                         arb_dat_i <= arduino_gpio_dat_i;
                         arb_ack_i <= arduino_gpio_ack_i;
+                        arb_err_i <= arduino_gpio_err_i;
 				when x"50" =>
                         arb_dat_i <= arduino_gpio_dat_i;
                         arb_ack_i <= arduino_gpio_ack_i;
+                        arb_err_i <= arduino_gpio_err_i;
                 when x"58" =>
                         arb_dat_i <= arduino_uart_dat_i;
                         arb_ack_i <= arduino_uart_ack_i;
+                        arb_err_i <= arduino_uart_err_i;
                 when x"60" =>
                         arb_dat_i <= arduino_spi_dat_i;
                         arb_ack_i <= arduino_spi_ack_i;
+                        arb_err_i <= arduino_spi_err_i;
                 when x"68" =>
                         arb_dat_i <= arduino_i2c_dat_i;
                         arb_ack_i <= arduino_i2c_ack_i;
+                        arb_err_i <= arduino_i2c_err_i;
                 when x"70" =>
                         arb_dat_i <= adc_dat_i;	
                         arb_ack_i <= adc_ack_i;
+                        arb_err_i <= adc_err_i;
                 when others =>
                         arb_dat_i <= (others => '0');
-                        arb_ack_i <= '0';						
+                        arb_ack_i <= '0';		
+                        arb_err_i <= '0';				
             end case;
         end if;
 	  end if;
@@ -413,6 +442,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  led_ack_i,
+        err_o       =>  led_err_i,
         led_o       =>  con_led --io       
     );
     
@@ -428,6 +458,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  sw_ack_i,
+        err_o       =>  sw_err_i,
         switch_i    =>  sw --io
 
     );
@@ -444,6 +475,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  btn_ack_i,
+        err_o       =>  btn_err_i,
         button_i    => 	btn --io
     );
     
@@ -462,7 +494,8 @@ begin
         we_i        =>  reg_we_o,
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
-        ack_o       =>  pmod1_ack_i,                           
+        ack_o       =>  pmod1_ack_i,
+        err_o       =>  pmod1_err_i,
         pmod_io     => 	con_pmod1 --io 
     );
     
@@ -481,7 +514,8 @@ begin
         we_i        =>  reg_we_o,
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
-        ack_o       =>  pmod2_ack_i,                           
+        ack_o       =>  pmod2_ack_i,
+        err_o       =>  pmod2_err_i,
         pmod_io     => 	con_pmod2 --io 
     );
     
@@ -500,7 +534,8 @@ begin
         we_i        =>  reg_we_o,
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
-        ack_o       =>  pmod3_ack_i,                           
+        ack_o       =>  pmod3_ack_i,
+        err_o       =>  pmod3_err_i,
         pmod_io     => 	con_pmod3 --io 
     );
     
@@ -516,6 +551,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  arduino_gpio_ack_i,
+        err_o       =>  arduino_gpio_err_i,
         io       	=>  con_io --io
     );
     
@@ -531,6 +567,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  arduino_uart_ack_i,
+        err_o       =>  arduino_uart_err_i,
         tx_o       	=>  con_tx,
         rx_i       	=>  io_rx
     );
@@ -547,6 +584,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  arduino_spi_ack_i,
+        err_o       =>  arduino_spi_err_i,
         miso_i      =>  io_miso,
         mosi_o      =>  con_mosi,
         sck_o       =>  con_sck,
@@ -565,6 +603,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  arduino_i2c_ack_i,
+        err_o       =>  arduino_i2c_err_i,
         scl_o       =>  con_scl,
         sda         =>  con_sda       
     );
@@ -581,6 +620,7 @@ begin
         stb_i		=>	reg_stb_o,
         cyc_i       =>  reg_cyc_o,
         ack_o       =>  adc_ack_i,
+        err_o       =>  adc_err_i,
         scl_o       =>  con_adc_scl,
         sda         =>  con_adc_sda       
     );
