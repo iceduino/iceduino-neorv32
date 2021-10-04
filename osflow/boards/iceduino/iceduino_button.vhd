@@ -39,14 +39,13 @@ begin
       if (module_active = '1') then
         ack_o <= '1';
       else   
-        ack_o <= 'Z';
+        ack_o <= '0';
       end if;
 	  -- read access	
       reg_button <= button_i(4 downto 0); 	  
-      dat_o <= (others => 'Z');
+      dat_o <= (others => '0');
       if ((module_active and (not we_i)) = '1') then
         if (module_addr = button_addr) then
-            dat_o(31 downto 5) <= (others => '0');
             dat_o(4 downto 0) <= reg_button;
         end if;
       end if;

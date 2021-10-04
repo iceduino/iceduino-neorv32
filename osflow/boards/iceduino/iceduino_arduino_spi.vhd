@@ -45,10 +45,10 @@ begin
       if (module_active = '1') then
         ack_o <= '1';
       else   
-        ack_o <= 'Z';
+        ack_o <= '0';
       end if;
       -- read access --
-      dat_o <= (others => 'L');
+      dat_o <= (others => '0');
 
 
     end if;

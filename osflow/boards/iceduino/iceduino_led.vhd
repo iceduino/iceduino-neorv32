@@ -22,39 +22,57 @@ end entity;
 
 architecture iceduino_led_rtl of iceduino_led  is
 
-  signal module_active : std_ulogic;
-  constant led_addr : std_ulogic_vector(31 downto 0) := x"FFFF8000";
-  signal module_addr   : std_ulogic_vector(31 downto 0);
-  signal reg_led : std_ulogic_vector(7 downto 0);
   
+-- access control --
+  signal acc_en : std_ulogic; -- module access enable
+  signal addr   : std_ulogic_vector(31 downto 0); -- access address
+
+  -- accessible regs --
+ 
+  signal dout : std_ulogic_vector(31 downto 0); -- r/w
+  
+  constant gpio_addr_o : std_ulogic_vector(31 downto 0) := x"FFFF8000"; 
 
 begin
-  -- module active
-  module_active <= '1' when ((adr_i = led_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
-  module_addr   <= adr_i;
-  
-  w_access: process(clk_i)
+
+  -- Access Control -------------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  acc_en <= '1' when ((adr_i = gpio_addr_o and (cyc_i = '1' and stb_i = '1')) else '0';
+  addr   <= adr_i;
+
+  -- Read/Write Access ----------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  rw_access: process(clk_i)
   begin
-    if rising_edge(clk_i) then    
-      -- handshake
-      if (module_active = '1') then
-        ack_o <= '1';
-      else   
-        ack_o <= 'Z';
-      end if;
-      -- write access
-	  dat_o <= (others => 'L');
-      if ((module_active and we_i) = '1') then
-        if (module_addr = led_addr) then
-          reg_led <= dat_i(7 downto 0);          
-          dat_o(31 downto 8) <= (others => '0');
-		  dat_o(7 downto 0) <= reg_led;
+    if rising_edge(clk_i) then
+      -- bus handshake --
+      ack_o <= acc_en;
+      err_o <= '0';
+      
+
+      -- write access --
+      if ((acc_en and we_i) = '1') then
+        if (addr = gpio_addr_o) then
+          dout <= dat_i;
         end if;  
       end if;
+
+     
+
+      -- read access --
+      dat_o <= (others => '0');
+      if ((acc_en and (not we_i)) = '1') then
+        case addr is
+              
+          when gpio_addr_o => dat_o <= dout;       
+          when others             => dat_o <= (others => '0');
+        end case;
+      end if;
+
     end if;
-  end process w_access;
+  end process rw_access;
 
-  -- output
-  led_o <= reg_led;
-
+  -- output --
+  led_o <= dout(7 downto 0);
+  
 end architecture ;

@@ -39,14 +39,13 @@ begin
       if (module_active = '1') then
         ack_o <= '1';
       else   
-        ack_o <= 'Z';
+        ack_o <= '0';
       end if;
 	  -- read access
       reg_switch <= switch_i; 
-      dat_o <= (others => 'L');
+      dat_o <= (others => '0');
       if ((module_active and (not we_i)) = '1') then
-        if (module_addr = switch_addr) then
-            dat_o(31 downto 2) <= (others => '0');
+        if (module_addr = switch_addr) then            
             dat_o(1 downto 0) <= reg_switch;
         end if;
       end if;

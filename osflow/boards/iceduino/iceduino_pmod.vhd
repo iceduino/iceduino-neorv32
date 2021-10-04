@@ -45,7 +45,7 @@ begin
       if (module_active = '1') then
         ack_o <= '1';
       else   
-        ack_o <= 'Z';
+        ack_o <= '0';
       end if;        
 
       if ((module_active and we_i) = '1') then

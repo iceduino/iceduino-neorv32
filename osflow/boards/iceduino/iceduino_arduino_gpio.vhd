@@ -41,7 +41,7 @@ begin
       if (module_active = '1') then
         ack_o <= '1';
       else   
-        ack_o <= 'Z';
+        ack_o <= '0';
       end if;
      
       
@@ -56,7 +56,7 @@ begin
       din <= io(7 downto 0);    
 
       -- read access --
-      dat_o <= (others => 'Z');
+      dat_o <= (others => '0');
       if ((module_active and (not we_i)) = '1') then
         case module_addr is
           when gpio_addr_i  => dat_o(7 downto 0) <= din;         
