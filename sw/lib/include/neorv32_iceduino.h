@@ -16,7 +16,7 @@
 
 //#memory mapped io#
 //LED base address
-#define ICEDUINO_LED_BASE (0xFFFF8000UL) 
+#define ICEDUINO_LED_BASE (0xF0000000UL) 
 //LED output port 8-bit (r/w) */
 #define ICEDUINO_LED (*(IO_REG32 (ICEDUINO_LED_BASE)))
 

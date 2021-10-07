@@ -4,6 +4,9 @@ use ieee.numeric_std.all;
 
 
 entity iceduino_led is
+  generic (
+    addr : std_ulogic_vector(31 downto 0)
+  );
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rstn_i 	: in  std_ulogic; -- global reset line, low-active
@@ -26,20 +29,16 @@ architecture iceduino_led_rtl of iceduino_led  is
   
 -- access control --
   signal acc_en : std_ulogic; -- module access enable
-  signal addr   : std_ulogic_vector(31 downto 0); -- access address
 
   -- accessible regs --
  
   signal dout : std_ulogic_vector(31 downto 0); -- r/w
-  
-  constant gpio_addr_o : std_ulogic_vector(31 downto 0) := x"FFFF8000"; 
 
 begin
 
   -- Access Control -------------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
-  acc_en <= '1' when (adr_i = gpio_addr_o and (cyc_i = '1' and stb_i = '1')) else '0';
-  addr   <= adr_i;
+  acc_en <= '1' when (adr_i = addr and (cyc_i = '1' and stb_i = '1')) else '0';
 
   -- Read/Write Access ----------------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
@@ -48,14 +47,11 @@ begin
     if rising_edge(clk_i) then
       -- bus handshake --
       ack_o <= acc_en;
-      err_o <= '0';
       
 
       -- write access --
-      if ((acc_en and we_i) = '1') then
-        if (addr = gpio_addr_o) then
+      if (acc_en = '1' and we_i = '1') then
           dout <= dat_i;
-        end if;  
       end if;
 
      
@@ -63,11 +59,7 @@ begin
       -- read access --
       dat_o <= (others => '0');
       if ((acc_en and (not we_i)) = '1') then
-        case addr is
-              
-          when gpio_addr_o => dat_o <= dout;       
-          when others             => dat_o <= (others => '0');
-        end case;
+        dat_o <= dout;       
       end if;
 
     end if;
@@ -75,5 +67,6 @@ begin
 
   -- output --
   led_o <= dout(7 downto 0);
+  err_o <= '0';
   
 end architecture ;
