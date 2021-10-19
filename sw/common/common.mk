@@ -24,7 +24,7 @@ USER_FLAGS ?=
 
 # Relative or absolute path to the NEORV32 home folder
 NEORV32_HOME ?= ../../..
-ICEDUINO_NEORV32_HOME ?= ../..
+ICEDUINO_NEORV32_HOME ?= ../../..
 
 
 # -----------------------------------------------------------------------------

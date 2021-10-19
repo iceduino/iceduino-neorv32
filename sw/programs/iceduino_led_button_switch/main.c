@@ -48,7 +48,7 @@ int main() {
     } else {
         iceduino_led_clr_pin(6);
     }
-  
+    iceduino_led_set_pin(7);
   }
 
   return 0;

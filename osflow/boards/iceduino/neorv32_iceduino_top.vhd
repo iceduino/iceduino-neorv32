@@ -46,38 +46,38 @@ library neorv32;
 use neorv32.neorv32_package.all; -- for device primitives and macros
 
 entity neorv32_iceduino_top is
-  port (
+port (
     -- Clocks --
-    clk_12mhz : in  std_ulogic;
+    --clk_12mhz : in  std_ulogic;
     clk_50mhz : in  std_ulogic;
 
     -- Simple I/Os --
     led : out std_ulogic_vector(7 downto 0);    
-    -- btn : in std_ulogic_vector(4 downto 0);
-    -- sw  : in std_ulogic_vector(1 downto 0);
+    btn : in std_ulogic_vector(4 downto 0);
+    sw  : in std_ulogic_vector(1 downto 0);
 
     -- -- PMOD --
     -- pmod_pwr_en : out std_ulogic;
-    -- pmod1 : inout std_logic_vector(7 downto 0);
-    -- pmod2 : inout std_logic_vector(7 downto 0);
-    -- pmod3 : inout std_logic_vector(7 downto 0);
+    pmod1 : inout std_logic_vector(7 downto 0);
+    pmod2 : inout std_logic_vector(7 downto 0);
+    pmod3 : inout std_logic_vector(7 downto 0);
 
-    -- -- Arduino Header --
-    -- oe_j5 : out std_ulogic;
-    -- oe_j6 : out std_ulogic;
-    -- io_d : inout std_ulogic_vector(9 downto 2);
-    -- io_tx : out std_ulogic;
-    -- io_rx : in std_ulogic;
-    -- io_scl : out std_ulogic;
-    -- io_sda : inout std_ulogic;
-    -- io_miso : in std_ulogic;
-    -- io_mosi : out std_ulogic;
-    -- io_sck : out std_ulogic;
-    -- io_ss : out std_ulogic;
+    -- Arduino Header --
+    oe_j5 : out std_ulogic;
+    oe_j6 : out std_ulogic;
+    io_d : inout std_ulogic_vector(9 downto 2);
+    io_tx : out std_ulogic;
+    io_rx : in std_ulogic;
+    io_scl : out std_ulogic;
+    io_sda : inout std_ulogic;
+    io_miso : in std_ulogic;
+    io_mosi : out std_ulogic;
+    io_sck : out std_ulogic;
+    io_ss : out std_ulogic;
 
-    -- -- -- ADC --
-    -- adc_scl : inout std_ulogic;
-    -- adc_sda : inout std_ulogic;
+    -- -- ADC --
+    adc_scl : out std_ulogic;
+    adc_sda : inout std_ulogic;
 
     -- USB - UART/RS232
     uart_tx : out std_ulogic;
@@ -95,94 +95,141 @@ entity neorv32_iceduino_top is
     flash_sdi : in std_ulogic;
     flash_sck : out std_ulogic;
     flash_csn : out std_ulogic
-  );
+);
 end entity;
 
 architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
 
-  -- configuration --
-    constant f_clock_c : natural := 50000000; -- clock frequency in Hz
-	signal external_rstn : std_ulogic;
+-- configuration --
+constant f_clock_c : natural := 50000000; -- clock frequency in Hz
+signal external_rstn : std_ulogic;
 
-    type bus_wishbone_t is record
-        tag_o       : std_ulogic_vector(02 downto 0); -- request tag
-        adr_o       : std_ulogic_vector(31 downto 0); -- address
-        dat_i       : std_ulogic_vector(31 downto 0); -- read data
-        dat_o       : std_ulogic_vector(31 downto 0); -- write data
-        we_o        : std_ulogic; -- read/write
-        sel_o       : std_ulogic_vector(03 downto 0); -- byte enable
-        stb_o       : std_ulogic; -- strobe
-        cyc_o       : std_ulogic; -- valid cycle
-        lock_o      : std_ulogic; -- exclusive access request
-        ack_i       : std_ulogic; -- transfer acknowledge
-        err_i       : std_ulogic; -- transfer error
-    end record;
-
-    signal neorv32_bus : bus_wishbone_t;
-
-    -- module response bus - entry type --
-    type resp_bus_entry_t is record
-        rdata : std_ulogic_vector(data_width_c-1 downto 0);
-        ack   : std_ulogic;
-        err   : std_ulogic;
-    end record;
-    constant resp_bus_entry_terminate_c : resp_bus_entry_t := (rdata => (others => '0'), ack => '0', err => '0');
-
-    -- module response bus - device ID --
-    type resp_bus_id_t is (RESP_LED --, RESP_BTN, RESP_SW , RESP_PMOD1, RESP_PMOD2, RESP_PMOD3, RESP_UART, RESP_SPI,
-                    --RESP_GPIO, RESP_I2C, RESP_ADC
-                    );
-
-    -- module response bus --
-    type resp_bus_t is array (resp_bus_id_t) of resp_bus_entry_t;
-    signal resp_bus : resp_bus_t := (others => resp_bus_entry_terminate_c);
-    
+-- bus_wishbone --
+type bus_wishbone_t is record
+    tag_o       : std_ulogic_vector(02 downto 0); -- request tag
+    adr_o       : std_ulogic_vector(31 downto 0); -- address      
+    dat_o       : std_ulogic_vector(31 downto 0); -- write data
+    we_o        : std_ulogic; -- read/write
+    sel_o       : std_ulogic_vector(03 downto 0); -- byte enable
+    stb_o       : std_ulogic; -- strobe
+    cyc_o       : std_ulogic; -- valid cycle
+    lock_o      : std_ulogic; -- exclusive access request      
+end record;    
+signal master_bus : bus_wishbone_t;
 	
-	-- internal IO connection --
-    -- signal con_gpio : std_ulogic_vector(63 downto 0);
-    signal con_spi_csn  : std_ulogic_vector(07 downto 0);
-    -- signal con_io : std_logic_vector(7 downto 0);
-    -- signal con_tx : std_logic;
-    -- signal con_scl : std_logic;
-    -- signal con_sda : std_logic;
-    -- signal con_mosi : std_logic;
-    -- signal con_sck : std_logic;
-    -- signal con_ss : std_logic;    
-    -- signal con_adc_scl : std_logic;
-    -- signal con_adc_sda : std_logic;
+-- bus_wishbone slave response  --
+type slave_resp_t is record
+    rdata_i : std_ulogic_vector(31 downto 0);
+    ack_i   : std_ulogic;
+    err_i   : std_ulogic;
+end record;
+constant slave_resp_default : slave_resp_t := (rdata_i => (others => '0'), ack_i => '0', err_i => '0');
+signal active_slave_resp : slave_resp_t := slave_resp_default;
+signal led_resp : slave_resp_t := slave_resp_default;
+signal switch_resp : slave_resp_t := slave_resp_default;
+signal button_resp : slave_resp_t := slave_resp_default;
+signal pmod1_resp : slave_resp_t := slave_resp_default;
+signal pmod2_resp : slave_resp_t := slave_resp_default;
+signal pmod3_resp : slave_resp_t := slave_resp_default;
+signal gpio_resp : slave_resp_t := slave_resp_default;
+signal uart_resp : slave_resp_t := slave_resp_default;
+signal spi_resp : slave_resp_t := slave_resp_default;
+signal i2c_resp : slave_resp_t := slave_resp_default;
+signal adc_resp : slave_resp_t := slave_resp_default;
+
+-- internal IO connection --
+-- signal con_gpio : std_ulogic_vector(63 downto 0);
+signal con_spi_csn  : std_ulogic_vector(07 downto 0);
 
 begin
 
-	process(clk_50mhz) is
-	variable cnt : unsigned(7 downto 0) := (others => '0');
-	begin
-	  if rising_edge(clk_50mhz) then
-		if cnt < 255 then
-		  cnt := cnt + 1;
-		  external_rstn <= '0';
-		else
-		  external_rstn <= '1';
-		end if;
-	  end if;
-	end process;
-
-    -- bus response --
-    bus_response: process(resp_bus)
-        variable rdata_v : std_ulogic_vector(data_width_c-1 downto 0);
-        variable ack_v   : std_ulogic;
-        variable err_v   : std_ulogic;
+    process(clk_50mhz) is
+    variable cnt : unsigned(7 downto 0) := (others => '0');
     begin
-        rdata_v := (others => '0');
-        ack_v   := '0';
-        err_v   := '0';
-        for i in resp_bus'range loop
-            rdata_v := rdata_v or resp_bus(i).rdata; -- read data
-            ack_v   := ack_v   or resp_bus(i).ack;   -- acknowledge
-            err_v   := err_v   or resp_bus(i).err;   -- error
-        end loop; -- i
-        neorv32_bus.dat_i <= rdata_v; -- processor bus: CPU transfer data input
-        neorv32_bus.ack_i   <= ack_v;   -- processor bus: CPU transfer ACK input
-        neorv32_bus.err_i   <= err_v; -- processor bus: CPU transfer data bus error input
+        if rising_edge(clk_50mhz) then
+            if cnt < 255 then
+                cnt := cnt + 1;
+                external_rstn <= '0';
+            else
+                external_rstn <= '1';
+            end if;
+        end if;
+    end process;
+
+    -- external bus multiplexer --
+    bus_multiplexer: process(master_bus, led_resp,switch_resp,button_resp)
+    begin
+        active_slave_resp.rdata_i <= (others => '0');
+        active_slave_resp.ack_i <= '0';
+        active_slave_resp.err_i <= '0';
+        if(master_bus.adr_o(31 downto 8) = x"F00000") then
+            case master_bus.adr_o(7 downto 0) is
+                when x"00" =>
+                        active_slave_resp.rdata_i <= led_resp.rdata_i; 
+                        active_slave_resp.ack_i <= led_resp.ack_i;
+                        active_slave_resp.err_i <= led_resp.err_i;
+                when x"08" =>
+                        active_slave_resp.rdata_i <= switch_resp.rdata_i; 
+                        active_slave_resp.ack_i <= switch_resp.ack_i;
+                        active_slave_resp.err_i <= switch_resp.err_i;
+                when x"10" =>
+                        active_slave_resp.rdata_i <= button_resp.rdata_i; 
+                        active_slave_resp.ack_i <= button_resp.ack_i;
+                        active_slave_resp.err_i <= button_resp.err_i;
+                when x"18" =>
+                        active_slave_resp.rdata_i <= pmod1_resp.rdata_i; 
+                        active_slave_resp.ack_i <= pmod1_resp.ack_i;
+                        active_slave_resp.err_i <= pmod1_resp.err_i; 
+                when x"20" =>
+                        active_slave_resp.rdata_i <= pmod1_resp.rdata_i; 
+                        active_slave_resp.ack_i <= pmod1_resp.ack_i;
+                        active_slave_resp.err_i <= pmod1_resp.err_i;  
+                when x"28" =>
+                        active_slave_resp.rdata_i <= pmod2_resp.rdata_i; 
+                        active_slave_resp.ack_i <= pmod2_resp.ack_i;
+                        active_slave_resp.err_i <= pmod2_resp.err_i;
+                when x"30" =>
+                        active_slave_resp.rdata_i <= pmod2_resp.rdata_i; 
+                        active_slave_resp.ack_i <= pmod2_resp.ack_i;
+                        active_slave_resp.err_i <= pmod2_resp.err_i; 
+                when x"38" =>
+                        active_slave_resp.rdata_i <= pmod3_resp.rdata_i; 
+                        active_slave_resp.ack_i <= pmod3_resp.ack_i;
+                        active_slave_resp.err_i <= pmod3_resp.err_i;
+                when x"40" =>
+                        active_slave_resp.rdata_i <= pmod3_resp.rdata_i; 
+                        active_slave_resp.ack_i <= pmod3_resp.ack_i;
+                        active_slave_resp.err_i <= pmod3_resp.err_i; 
+                when x"48" =>
+                        active_slave_resp.rdata_i <= gpio_resp.rdata_i; 
+                        active_slave_resp.ack_i <= gpio_resp.ack_i;
+                        active_slave_resp.err_i <= gpio_resp.err_i;  
+                when x"50" =>
+                        active_slave_resp.rdata_i <= gpio_resp.rdata_i; 
+                        active_slave_resp.ack_i <= gpio_resp.ack_i;
+                        active_slave_resp.err_i <= gpio_resp.err_i;
+                when x"58" =>
+                        active_slave_resp.rdata_i <= uart_resp.rdata_i; 
+                        active_slave_resp.ack_i <= uart_resp.ack_i;
+                        active_slave_resp.err_i <= uart_resp.err_i; 
+                when x"60" =>
+                        active_slave_resp.rdata_i <= spi_resp.rdata_i; 
+                        active_slave_resp.ack_i <= spi_resp.ack_i;
+                        active_slave_resp.err_i <= spi_resp.err_i;
+                when x"68" =>
+                        active_slave_resp.rdata_i <= i2c_resp.rdata_i; 
+                        active_slave_resp.ack_i <= i2c_resp.ack_i;
+                        active_slave_resp.err_i <= i2c_resp.err_i; 
+                when x"70" =>
+                        active_slave_resp.rdata_i <= adc_resp.rdata_i; 
+                        active_slave_resp.ack_i <= adc_resp.ack_i;
+                        active_slave_resp.err_i <= adc_resp.err_i;
+                when others =>
+                        active_slave_resp.rdata_i <= (others => '0');
+                        active_slave_resp.ack_i <= '0';
+                        active_slave_resp.err_i <= '0';
+            end case;
+        end if;
     end process;
 
 	neorv32_inst: neorv32_top
@@ -190,7 +237,7 @@ begin
 		-- General --
 		CLOCK_FREQUENCY              => f_clock_c,           -- clock frequency of clk_i in Hz
 		HW_THREAD_ID                 => 0,      -- hardware thread id (32-bit)
-		INT_BOOTLOADER_EN            => true,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
+		INT_BOOTLOADER_EN            => false,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
 
 		-- On-Chip Debugger (OCD) --
 		ON_CHIP_DEBUGGER_EN          => false,  -- implement on-chip debugger
@@ -236,7 +283,7 @@ begin
 
 		-- External memory interface (WISHBONE) --
 		MEM_EXT_EN                   => true,  -- implement external memory bus interface?
-		MEM_EXT_TIMEOUT              => 0,    -- cycles after a pending bus access auto-terminates (0 = disabled, default = 255)
+		MEM_EXT_TIMEOUT              => 255,    -- cycles after a pending bus access auto-terminates (0 = disabled, default = 255)
 		MEM_EXT_PIPE_MODE            => false,  -- protocol: false=classic/standard wishbone mode, true=pipelined wishbone mode
 		MEM_EXT_BIG_ENDIAN           => false,  -- byte order: true=big-endian, false=little-endian
 		MEM_EXT_ASYNC_RX             => false,  -- use register buffer for RX data when false
@@ -282,17 +329,17 @@ begin
 		jtag_tms_i     => 'U', -- mode select
 
 		-- Wishbone bus interface (available if MEM_EXT_EN = true) --
-		wb_tag_o       => neorv32_bus.tag_o, -- request tag
-		wb_adr_o       => neorv32_bus.adr_o, -- address
-		wb_dat_i       => neorv32_bus.dat_i, -- read data
-		wb_dat_o       => neorv32_bus.dat_o, -- write data
-		wb_we_o        => neorv32_bus.we_o, -- read/write
-		wb_sel_o       => neorv32_bus.sel_o, -- byte enable
-		wb_stb_o       => neorv32_bus.stb_o, -- strobe
-		wb_cyc_o       => neorv32_bus.cyc_o, -- valid cycle
-		wb_lock_o      => neorv32_bus.lock_o, -- exclusive access request
-		wb_ack_i       => neorv32_bus.ack_i, -- transfer acknowledge
-		wb_err_i       => neorv32_bus.err_i, -- transfer error
+		wb_tag_o       => open, -- request tag
+		wb_adr_o       => master_bus.adr_o, -- address
+		wb_dat_i       => active_slave_resp.rdata_i, -- read data
+		wb_dat_o       => master_bus.dat_o, -- write data
+		wb_we_o        => master_bus.we_o, -- read/write
+		wb_sel_o       => open, -- byte enable
+		wb_stb_o       => master_bus.stb_o, -- strobe
+		wb_cyc_o       => master_bus.cyc_o, -- valid cycle
+		wb_lock_o      => open, -- exclusive access request
+		wb_ack_i       => active_slave_resp.ack_i, -- transfer acknowledge
+		wb_err_i       => active_slave_resp.err_i, -- transfer error
 
 
 		-- Advanced memory control signals (available if MEM_EXT_EN = true) --
@@ -363,201 +410,221 @@ begin
 	-- module instance led --
     iceduino_led_inst: entity iceduino.iceduino_led
     generic map (
-        addr        =>  x"F0000000"
+        led_addr        =>  x"F0000000"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,       
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  led_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  led_resp.ack_i,
+        err_o       =>  led_resp.err_i,
+        led_o       =>  led      
+    );
+    
+    -- module instance switch --
+    iceduino_switch_inst: entity iceduino.iceduino_switch
+    generic map (
+        switch_addr        =>  x"F0000008"
     )
     port map (
         clk_i  		=>  clk_50mhz,
         rstn_i 		=>  external_rstn,
-        --wishbone-
-        adr_i		=>	neorv32_bus.adr_o,
-        dat_i	    =>  neorv32_bus.dat_o, --write to slave
-        dat_o	    =>  resp_bus(RESP_LED).rdata,
-        we_i        =>  neorv32_bus.we_o,
-        stb_i		=>	neorv32_bus.stb_o,
-        cyc_i       =>  neorv32_bus.cyc_o,
-        ack_o       =>  resp_bus(RESP_LED).ack,
-        err_o       =>  resp_bus(RESP_LED).err,
-        led_o       =>  led --io       
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  switch_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  switch_resp.ack_i,
+        err_o       =>  switch_resp.err_i,
+        switch_i    =>  sw
     );
     
-	-- -- module instance switch --
-    -- iceduino_switch_inst: entity iceduino.iceduino_switch
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  resp_bus(RESP_SW).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  resp_bus(RESP_SW).ack,
-    --     err_o       =>  resp_bus(RESP_SW).err,
-    --     switch_i    =>  sw --io
+    -- module instance button --
+    iceduino_button_inst: entity iceduino.iceduino_button
+    generic map (
+        button_addr        =>  x"F0000010"
+    )
+    port map (   
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  button_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  button_resp.ack_i,
+        err_o       =>  button_resp.err_i,
+        button_i    => 	btn
+    );
+    
+	-- module instance pmod1 --
+    iceduino_gpio_pmod1_inst: entity iceduino.iceduino_pmod
+    generic map (
+        pmod_addr_o => x"F0000018",
+        pmod_addr_i => x"F0000020"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  pmod1_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  pmod1_resp.ack_i,
+        err_o       =>  pmod1_resp.err_i,
+        pmod_io     => 	pmod1 --io 
+    );
+    
+	-- module instance pmod2 --
+    iceduino_gpio_pmod2_inst: entity iceduino.iceduino_pmod
+    generic map (
+        pmod_addr_o => x"F0000028",
+        pmod_addr_i => x"F0000030"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  pmod2_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  pmod2_resp.ack_i,
+        err_o       =>  pmod2_resp.err_i,
+        pmod_io     => 	pmod2 --io 
+    );
+    
+	-- module instance pmod3 --
+    iceduino_gpio_pmod3_inst: entity iceduino.iceduino_pmod
+    generic map (
+        pmod_addr_o => x"F0000038",
+        pmod_addr_i => x"F0000040"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  pmod3_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  pmod3_resp.ack_i,
+        err_o       =>  pmod3_resp.err_i,
+        pmod_io     => 	pmod3 --io 
+    );
+    
+	-- module instance arduino gpio --
+    iceduino_arduino_gpio_inst: entity iceduino.iceduino_arduino_gpio
+    generic map (
+        gpio_addr_o => x"F0000048",
+        gpio_addr_i => x"F0000050"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  gpio_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  gpio_resp.ack_i,
+        err_o       =>  gpio_resp.err_i,
+        io       	=>  io_d --io
+    );
 
-    -- );
+    -- module instance arduino uart --
+    iceduino_arduino_uart_inst: entity iceduino.iceduino_arduino_uart
+    generic map (
+        uart_addr  => x"F0000058"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  uart_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  uart_resp.ack_i,
+        err_o       =>  uart_resp.err_i,
+        tx_o       	=>  io_tx,
+        rx_i       	=>  io_rx
+    );    
     
-	-- -- module instance button --
-    -- iceduino_button_inst: entity iceduino.iceduino_button
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  resp_bus(RESP_BTN).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  resp_bus(RESP_BTN).ack,
-    --     err_o       =>  resp_bus(RESP_BTN).err,
-    --     button_i    => 	btn --io
-    -- );
+    -- module instance arduino spi --
+    iceduino_arduino_spi_inst: entity iceduino.iceduino_arduino_spi
+    generic map (
+        spi_addr  => x"F0000060"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  spi_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  spi_resp.ack_i,
+        err_o       =>  spi_resp.err_i,
+        miso_i      =>  io_miso,
+        mosi_o      =>  io_mosi,
+        sck_o       =>  io_sck,
+        ss_o        =>  io_ss
+    );
     
-	-- -- module instance pmod1 --
-    -- iceduino_gpio_pmod1_inst: entity iceduino.iceduino_pmod
-    -- generic map (
-    --     pmod_instance_addr_i  => x"FFFF8018",
-    --     pmod_instance_addr_o  => x"FFFF8020"
-    -- )
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  resp_bus(RESP_PMOD1).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  resp_bus(RESP_PMOD1).ack,
-    --     err_o       =>  resp_bus(RESP_PMOD1).err,
-    --     pmod_io     => 	pmod1 --io 
-    -- );
+    -- module instance arduino i2c --
+    iceduino_arduino_i2c_inst: entity iceduino.iceduino_arduino_i2c
+    generic map (
+        i2c_addr  => x"F0000068"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  i2c_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  i2c_resp.ack_i,
+        err_o       =>  i2c_resp.err_i,
+        scl_o       =>  io_scl,
+        sda         =>  io_sda       
+    );
     
-	-- -- module instance pmod2 --
-    -- iceduino_gpio_pmod2_inst: entity iceduino.iceduino_pmod
-    -- generic map (
-    --     pmod_instance_addr_i  => x"FFFF8028",
-    --     pmod_instance_addr_o  => x"FFFF8030"
-    -- )
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_PMOD2).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_PMOD2).ack,
-    --     err_o       =>  RESP_BUS(RESP_PMOD2).err,
-    --     pmod_io     => 	pmod2 --io 
-    -- );
-    
-	-- -- module instance pmod3 --
-    -- iceduino_gpio_pmod3_inst: entity iceduino.iceduino_pmod
-    -- generic map (
-    --     pmod_instance_addr_i  => x"FFFF8038",
-    --     pmod_instance_addr_o  => x"FFFF8040"
-    -- )
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_PMOD3).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_PMOD3).ack,
-    --     err_o       =>  RESP_BUS(RESP_PMOD3).err,
-    --     pmod_io     => 	pmod3 --io 
-    -- );
-    
-	-- -- module instance arduino gpio --
-    -- iceduino_arduino_gpio_inst: entity iceduino.iceduino_arduino_gpio
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_GPIO).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_GPIO).ack,
-    --     err_o       =>  RESP_BUS(RESP_GPIO).err,
-    --     io       	=>  con_io --io
-    -- );
-    
-    -- -- module instance arduino uart --
-    -- iceduino_arduino_uart_inst: entity iceduino.iceduino_arduino_uart
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_UART).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_UART).ack,
-    --     err_o       =>  RESP_BUS(RESP_UART).err,
-    --     tx_o       	=>  con_tx,
-    --     rx_i       	=>  io_rx
-    -- );
-    
-    -- -- module instance arduino spi --
-    -- iceduino_arduino_spi_inst: entity iceduino.iceduino_arduino_spi
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_SPI).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_SPI).ack,
-    --     err_o       =>  RESP_BUS(RESP_SPI).err,
-    --     miso_i      =>  io_miso,
-    --     mosi_o      =>  con_mosi,
-    --     sck_o       =>  con_sck,
-    --     ss_o        =>  con_ss
-    -- );
-    
-    -- -- module instance arduino i2c --
-    -- iceduino_arduino_i2c_inst: entity iceduino.iceduino_arduino_i2c
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_I2C).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_I2C).ack,
-    --     err_o       =>  RESP_BUS(RESP_I2C).err,
-    --     scl_o       =>  con_scl,
-    --     sda         =>  con_sda       
-    -- );
-    
-    -- -- module instance adc --
-    -- iceduino_arduino_adc_inst: entity iceduino.iceduino_arduino_adc
-    -- port map (
-    --     clk_i  		=>  clk_50mhz,
-    --     rstn_i 		=>  external_rstn,
-    --     adr_i		=>	neorv32_bus.adr_o,
-    --     dat_i	    =>  neorv32_bus.dat_o, --write to slave
-    --     dat_o	    =>  RESP_BUS(RESP_ADC).rdata,
-    --     we_i        =>  neorv32_bus.we_o,
-    --     stb_i		=>	neorv32_bus.stb_o,
-    --     cyc_i       =>  neorv32_bus.cyc_o,
-    --     ack_o       =>  RESP_BUS(RESP_ADC).ack,
-    --     err_o       =>  RESP_BUS(RESP_ADC).err,
-    --     scl_o       =>  adc_scl,
-    --     sda         =>  adc_sda       
-    -- );
+    -- module instance adc --
+    iceduino_arduino_adc_inst: entity iceduino.iceduino_arduino_adc
+    generic map (
+        adc_addr  => x"F0000070"
+    )
+    port map (
+        clk_i  		=>  clk_50mhz,
+        rstn_i 		=>  external_rstn,
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  adc_resp.rdata_i,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  adc_resp.ack_i,
+        err_o       =>  adc_resp.err_i,
+        scl_o       =>  adc_scl,
+        sda         =>  adc_sda       
+    );
 	
 	-- outputs internal --
 	flash_csn <= con_spi_csn(0);

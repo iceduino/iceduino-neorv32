@@ -2,7 +2,7 @@
 
 //set led port (0-7)
 void iceduino_led_set(int value) {
-  ICEDUINO_LED = (uint32_t) value;
+  ICEDUINO_LED = (uint8_t) value;
 }
 
 //clear output
@@ -12,13 +12,13 @@ void iceduino_led_clr() {
 
 //set led pin 
 void iceduino_led_set_pin(int pin) {
-  uint32_t mask = (uint32_t)(1 << (pin & 0x7));
+  uint8_t mask = (uint8_t)(1 << (pin & 0x7));
   ICEDUINO_LED = ICEDUINO_LED | mask;
 }
 
 //clear led pin
 void iceduino_led_clr_pin(int pin) {
-  uint32_t mask = (uint32_t)(1 << (pin & 0x7));
+  uint8_t mask = (uint8_t)(1 << (pin & 0x7));
   ICEDUINO_LED = ICEDUINO_LED & ~mask;
 }
 

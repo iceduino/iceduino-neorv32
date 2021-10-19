@@ -33,13 +33,10 @@
 # ********************************************************************************************* #
 # The NEORV32 Processor - https://github.com/stnolting/neorv32              (c) Stephan Nolting #
 #################################################################################################
-
-NEORV32_HOME ?= ../../neorv32/
+NEORV32_HOME ?= ../../../neorv32/
 MARCH ?= -march=rv32i
-
-APP_INC = -I ../lib/include
-
-APP_SRC = $(wildcard ../lib/source/*.c) $(wildcard ../lib/source/*.s) $(wildcard ../lib/source/*.cpp) $(wildcard ../lib/source/*.S)
+APP_INC = -I ../../lib/include
+APP_SRC = $(wildcard ../../lib/source/*.c) $(wildcard ../../lib/source/*.s) $(wildcard ../../lib/source/*.cpp) $(wildcard ../../lib/source/*.S)
 APP_SRC += $(wildcard ./*.c) $(wildcard ./*.s) $(wildcard ./*.cpp) $(wildcard ./*.S)
 
-include ../common/common.mk
+include ../../common/common.mk

@@ -7,6 +7,9 @@ use ieee.numeric_std.all;
 --#########
 
 entity iceduino_arduino_adc is
+  generic (
+    adc_addr : std_ulogic_vector(31 downto 0)
+  );
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rstn_i 	: in  std_ulogic; -- global reset line, low-active
@@ -28,30 +31,28 @@ architecture iceduino_arduino_adc_rtl of iceduino_arduino_adc is
 
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
-  constant m_addr : std_ulogic_vector(31 downto 0) := x"FFFF8070"; 
-
 
 begin
 
   -- module active
-  module_active <= '1' when ((adr_i = m_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
-  module_addr   <= adr_i;
+ module_active <= '1' when ((adr_i = adc_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
+ module_addr   <= adr_i;
 
-  rw_access: process(clk_i)
-  begin
-    if rising_edge(clk_i) then
-       -- handshake
-      if (module_active = '1') then
-        ack_o <= '1';
-      else   
-        ack_o <= '0';
-      end if;
-      -- read access --
-      dat_o <= (others => '0');
+ p_access: process(clk_i)
+ begin
+   if rising_edge(clk_i) then
+     -- handshake
+     err_o <= '0'; 
+     if (module_active = '1') then
+       ack_o <= '1';
+     else   
+       ack_o <= '0';
+     end if;
+     -- read
+     dat_o <= (others => '0');
 
-
-    end if;
-  end process rw_access;
+   end if;
+ end process p_access;
 
   -- output --
   sda <= 'Z';

@@ -4,6 +4,9 @@ use ieee.numeric_std.all;
 
 
 entity iceduino_button is
+  generic (
+    button_addr : std_ulogic_vector(31 downto 0)
+  );
   port (
     clk_i  : in  std_ulogic; -- global clock line
     rstn_i 	: in  std_ulogic; -- global reset line, low-active
@@ -26,7 +29,7 @@ architecture iceduino_button_rtl of iceduino_button is
   signal module_active : std_ulogic;
   signal module_addr   : std_ulogic_vector(31 downto 0);
   signal reg_button  : std_ulogic_vector(4 downto 0);  
-  constant button_addr : std_ulogic_vector(31 downto 0) := x"FFFF8010"; 
+
 
 begin
   -- module active
@@ -36,23 +39,20 @@ begin
   r_access: process(clk_i)
   begin
     if rising_edge(clk_i) then
-	  -- handshake
+	    -- handshake
+	    err_o <= '0';
       if (module_active = '1') then
         ack_o <= '1';
       else   
         ack_o <= '0';
       end if;
-	  -- read access	
-      reg_button <= button_i(4 downto 0); 	  
+	    -- read
+      reg_button <= not button_i; 
       dat_o <= (others => '0');
-      if ((module_active and (not we_i)) = '1') then
-        if (module_addr = button_addr) then
-            dat_o(4 downto 0) <= reg_button;
-        end if;
+      if (module_active = '1' and we_i = '0') then                    
+        dat_o(4 downto 0) <= reg_button;        
       end if;
     end if;
   end process r_access;
-
-
-
+  
 end architecture ;

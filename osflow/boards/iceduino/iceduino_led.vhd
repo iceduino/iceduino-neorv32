@@ -1,11 +1,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
 
 entity iceduino_led is
   generic (
-    addr : std_ulogic_vector(31 downto 0)
+    led_addr : std_ulogic_vector(31 downto 0)
   );
   port (
     clk_i  : in  std_ulogic; -- global clock line
@@ -25,48 +23,39 @@ entity iceduino_led is
 end entity;
 
 architecture iceduino_led_rtl of iceduino_led  is
-
   
--- access control --
-  signal acc_en : std_ulogic; -- module access enable
-
-  -- accessible regs --
- 
-  signal dout : std_ulogic_vector(31 downto 0); -- r/w
+  signal module_active : std_ulogic;
+  signal module_addr   : std_ulogic_vector(31 downto 0);
+  signal reg_led : std_ulogic_vector(7 downto 0);
 
 begin
-
-  -- Access Control -------------------------------------------------------------------------
-  -- -------------------------------------------------------------------------------------------
-  acc_en <= '1' when (adr_i = addr and (cyc_i = '1' and stb_i = '1')) else '0';
-
-  -- Read/Write Access ----------------------------------------------------------------------
-  -- -------------------------------------------------------------------------------------------
-  rw_access: process(clk_i)
+  -- module active
+  module_active <= '1' when ((adr_i = led_addr) and (cyc_i = '1' and stb_i = '1')) else '0';
+  module_addr   <= adr_i;
+  
+  w_access: process(clk_i)
   begin
-    if rising_edge(clk_i) then
-      -- bus handshake --
-      ack_o <= acc_en;
-      
-
-      -- write access --
-      if (acc_en = '1' and we_i = '1') then
-          dout <= dat_i;
+    if rising_edge(clk_i) then    
+      -- handshake
+      err_o <= '0';
+      if (module_active = '1') then
+        ack_o <= '1';        
+      else   
+        ack_o <= '0';
       end if;
-
-     
-
-      -- read access --
-      dat_o <= (others => '0');
-      if ((acc_en and (not we_i)) = '1') then
-        dat_o <= dout;       
+      --write  
+      if (module_active = '1' and we_i = '1') then
+          reg_led <= dat_i(7 downto 0);          
       end if;
-
+      --read
+      dat_o(31 downto 0) <= (others => '0');  
+      if (module_active = '1' and we_i = '0') then
+        dat_o(7 downto 0) <= reg_led;             
+      end if;      
     end if;
-  end process rw_access;
-
-  -- output --
-  led_o <= dout(7 downto 0);
-  err_o <= '0';
+  end process w_access;
+  
+  -- output
+  led_o <= reg_led;  
   
 end architecture ;
