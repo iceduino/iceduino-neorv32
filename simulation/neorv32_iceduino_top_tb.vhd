@@ -51,7 +51,7 @@ architecture neorv32_iceduino_top_sim of neorv32_iceduino_top_tb is
 
 begin
 
-  clk <= not clk after 20 ns;
+  clk <= not clk after 10 ns;
   sw <= "11", "10" after 550 us, "01" after 560 us, "00" after 570 us; --low_active
   btn <= "11111", "11110" after 580 us, "11100" after 590 us, "11000" after 600 us, "10000" after 610 us, "00000" after 620 us; --low_active
 

@@ -54,9 +54,9 @@
 //ARDUINO UART address
 #define ICEDUINO_ARD_GPIO_BASE (0xF0000048UL)
 //ARDUINO UART output port 8-bit (r/w) */
-#define ICEDUINO_PMOD1_OUTPUT (*((volatile uint8_t*) (ICEDUINO_ARD_GPIO_BASE)))
+#define ICEDUINO_ARD_GPIO_OUTPUT (*((volatile uint8_t*) (ICEDUINO_ARD_GPIO_BASE)))
 //ARDUINO UART input port 8-bit (r) */
-#define ICEDUINO_PMOD1_INPUT (*((const volatile uint8_t*) (ICEDUINO_ARD_GPIO_BASE + 8)))
+#define ICEDUINO_ARD_GPIO_INPUT (*((const volatile uint8_t*) (ICEDUINO_ARD_GPIO_BASE + 8)))
 
 //ARDUINO UART address
 #define ICEDUINO_ARD_UART_BASE (0xF0000058UL) 
