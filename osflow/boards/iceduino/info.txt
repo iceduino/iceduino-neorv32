@@ -1,6 +1,0 @@
--DMEM Size 2*1024 Byte
--SPI address 0x30000
--SPI CMDs modiefied
-
-
-

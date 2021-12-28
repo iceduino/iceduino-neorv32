@@ -23,7 +23,7 @@ MABI  ?= -mabi=ilp32
 USER_FLAGS ?=
 
 # Relative or absolute path to the NEORV32 home folder
-NEORV32_HOME ?= ../../..
+NEORV32_HOME ?= ../../neorv32
 ICEDUINO_NEORV32_HOME ?= ../../..
 
 
@@ -33,7 +33,7 @@ ICEDUINO_NEORV32_HOME ?= ../../..
 # Path to NEORV32 linker script and startup file
 NEORV32_COM_PATH = $(NEORV32_HOME)/sw/common
 # Path to IceduinoNEORV32 linker script and startup file
-ICEDUINO_NEORV32_COM_PATH = $(ICEDUINO_NEORV32_HOME)/sw/common
+ICEDUINO_NEORV32_COM_PATH = $(ICEDUINO_NEORV32_HOME)/sw_iceduino/common
 # Path to main NEORV32 library include files
 NEORV32_INC_PATH = $(NEORV32_HOME)/sw/lib/include
 # Path to main NEORV32 library source files
