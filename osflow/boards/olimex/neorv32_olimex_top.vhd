@@ -80,7 +80,9 @@ port (
     IOL_13A : inout std_ulogic;
     IOL_13B : inout std_ulogic;
     IOL_14B : inout std_ulogic;
-    IOL_15A : inout std_ulogic
+    IOL_15A : inout std_ulogic;
+    RxD : in std_ulogic;
+    TxD : out std_ulogic
 );
 end entity;
 
@@ -180,7 +182,7 @@ begin
 		-- General --
 		CLOCK_FREQUENCY              => f_clock_c,           -- clock frequency of clk_i in Hz
 		HW_THREAD_ID                 => 0,      -- hardware thread id (32-bit)
-		INT_BOOTLOADER_EN            => false,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
+		INT_BOOTLOADER_EN            => true,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
 		-- On-Chip Debugger (OCD) --
 		ON_CHIP_DEBUGGER_EN          => false,  -- implement on-chip debugger
 		-- RISC-V CPU Extensions --
@@ -205,7 +207,7 @@ begin
 		MEM_EXT_PIPE_MODE            => false,  -- protocol: false=classic/standard wishbone mode, true=pipelined wishbone mode
 		MEM_EXT_BIG_ENDIAN           => false,  -- byte order: true=big-endian, false=little-endian
 		MEM_EXT_ASYNC_RX             => false,  -- use register buffer for RX data when false
-		IO_UART0_EN                  => false
+		IO_UART0_EN                  => true
 	)
 	port map (
 		-- Global control --
@@ -238,8 +240,8 @@ begin
 		mext_irq_i     => 'L',  -- machine external interrupt
 		
 				-- primary UART0 (available if IO_UART0_EN = true) --
-		uart0_txd_o    => open, -- UART0 send data
-		uart0_rxd_i    => '0', -- UART0 receive data
+		uart0_txd_o    => IOL_5A, -- UART0 send data
+		uart0_rxd_i    => '1', -- UART0 receive data
 		uart0_rts_o    => open, -- hw flow control: UART0.RX ready to receive ("RTR"), low-active, optional
 		uart0_cts_i    => '0' -- hw flow control: UART0.TX allowed to transmit, low-active, optional
 		

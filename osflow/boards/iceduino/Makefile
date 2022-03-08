@@ -69,6 +69,7 @@ ICEDUINO_SRC := \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_spi.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_i2c.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_arduino_adc.vhd \
+  $(ICEDUINO_HOME)/osflow/boards/iceduino/iceduino_ram.vhd \
   $(ICEDUINO_HOME)/osflow/boards/iceduino/neorv32_iceduino_top.vhd 
   
 DESIGN_NAME := iceduino

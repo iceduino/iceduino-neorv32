@@ -59,7 +59,7 @@ MEMORY
 /* ram section: first value of LENGTH => data memory used by bootloader (fixed!); second value of LENGTH => *physical* size of data memory */
 /* adapt the right-most value to match the *total physical data memory size* of your setup */
 
-  ram  (rwx) : ORIGIN = 0x80000000, LENGTH = DEFINED(make_bootloader) ? 512 : 2*1024
+  ram  (rwx) : ORIGIN = 0x80000000, LENGTH = DEFINED(make_bootloader) ? 512 : 262144
 
 /* rom and iodev sections should NOT be modified by the user at all! */
 /* rom section: first value of ORIGIN/LENGTH => bootloader ROM; second value of ORIGIN/LENGTH => maximum *logical* size of instruction memory */

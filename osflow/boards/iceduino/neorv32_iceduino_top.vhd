@@ -48,8 +48,8 @@ use neorv32.neorv32_package.all; -- for device primitives and macros
 entity neorv32_iceduino_top is
 port (
     -- Clocks --
-    --clk_12mhz : in  std_ulogic;
-    clk_50mhz : in  std_ulogic;
+    clk_12mhz : in  std_ulogic;
+    -- clk_50mhz : in  std_ulogic;
 
     -- Simple I/Os --
     led : out std_ulogic_vector(7 downto 0);    
@@ -94,14 +94,21 @@ port (
     flash_sdo : out std_ulogic;
     flash_sdi : in std_ulogic;
     flash_sck : out std_ulogic;
-    flash_csn : out std_ulogic
+    flash_csn : out std_ulogic;
+
+    -- SRAM --
+    sram_addr : out std_ulogic_vector(18 downto 0);
+    sram_io : inout std_ulogic_vector(7 downto 0);
+    sram_ce : out std_ulogic;
+    sram_we : out std_ulogic;
+    sram_oe : out std_ulogic
 );
 end entity;
 
 architecture neorv32_iceduino_top_rtl of neorv32_iceduino_top is
 
 -- configuration --
-constant f_clock_c : natural := 50000000; -- clock frequency in Hz
+constant f_clock_c : natural := 12000000; -- clock frequency in Hz
 signal external_rstn : std_ulogic;
 
 -- bus_wishbone --
@@ -125,6 +132,7 @@ type slave_resp_t is record
 end record;
 constant slave_resp_default : slave_resp_t := (rdata_i => (others => '0'), ack_i => '0', err_i => '0');
 signal active_slave_resp : slave_resp_t := slave_resp_default;
+signal ram_resp : slave_resp_t := slave_resp_default;
 signal led_resp : slave_resp_t := slave_resp_default;
 signal switch_resp : slave_resp_t := slave_resp_default;
 signal button_resp : slave_resp_t := slave_resp_default;
@@ -141,12 +149,19 @@ signal adc_resp : slave_resp_t := slave_resp_default;
 -- signal con_gpio : std_ulogic_vector(63 downto 0);
 signal con_spi_csn  : std_ulogic_vector(07 downto 0);
 
+signal con_fence : std_ulogic;
+signal con_fencei : std_ulogic;
+
+-- signal con_ram_data_out : std_ulogic_vector(7 downto 0);
+-- signal con_ram_data_in  : std_ulogic_vector(7 downto 0);
+-- signal con_ram_sb_io_oe   : std_ulogic;
+
 begin
 
-    process(clk_50mhz) is
+    process(clk_12mhz) is
     variable cnt : unsigned(7 downto 0) := (others => '0');
     begin
-        if rising_edge(clk_50mhz) then
+        if rising_edge(clk_12mhz) then
             if cnt < 255 then
                 cnt := cnt + 1;
                 external_rstn <= '0';
@@ -157,7 +172,8 @@ begin
     end process;
 
     -- external bus multiplexer --
-    bus_multiplexer: process(master_bus, led_resp,switch_resp,button_resp)
+    -- bus_multiplexer: process(master_bus, led_resp,switch_resp,button_resp)
+    bus_multiplexer: process(master_bus, led_resp,switch_resp,button_resp,ram_resp)
     begin
         active_slave_resp.rdata_i <= (others => '0');
         active_slave_resp.ack_i <= '0';
@@ -229,6 +245,11 @@ begin
                         active_slave_resp.ack_i <= '0';
                         active_slave_resp.err_i <= '0';
             end case;
+        elsif ((UNSIGNED(master_bus.adr_o) >= x"00000000" and UNSIGNED(master_bus.adr_o) < x"00040000")
+            or (UNSIGNED(master_bus.adr_o) >= x"80000000" and UNSIGNED(master_bus.adr_o) < x"80040000")) then
+            active_slave_resp.rdata_i <= ram_resp.rdata_i;
+            active_slave_resp.ack_i <= ram_resp.ack_i;
+            active_slave_resp.err_i <= ram_resp.err_i;
         end if;
     end process;
 
@@ -237,7 +258,7 @@ begin
 		-- General --
 		CLOCK_FREQUENCY              => f_clock_c,           -- clock frequency of clk_i in Hz
 		HW_THREAD_ID                 => 0,      -- hardware thread id (32-bit)
-		INT_BOOTLOADER_EN            => true,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
+		INT_BOOTLOADER_EN            => false,  -- boot configuration: true = boot explicit bootloader, false = boot from int/ext (I)MEM
 
 		-- On-Chip Debugger (OCD) --
 		ON_CHIP_DEBUGGER_EN          => false,  -- implement on-chip debugger
@@ -272,7 +293,7 @@ begin
 		MEM_INT_IMEM_SIZE            => 8*1024, -- size of processor-internal instruction memory in bytes
 
 		-- Internal Data memory (DMEM) --
-		MEM_INT_DMEM_EN              => true,  -- implement processor-internal data memory
+		MEM_INT_DMEM_EN              => false,  -- implement processor-internal data memory
 		MEM_INT_DMEM_SIZE            => 2*1024, -- size of processor-internal data memory in bytes
 
 		-- Internal Cache memory (iCACHE) --
@@ -318,7 +339,7 @@ begin
 	)
 	port map (
 		-- Global control --
-		clk_i          => clk_50mhz, -- global clock, rising edge
+		clk_i          => clk_12mhz, -- global clock, rising edge
 		rstn_i         => external_rstn, -- global reset, low-active, async
 
 		-- JTAG on-chip debugger interface (available if ON_CHIP_DEBUGGER_EN = true) --
@@ -329,22 +350,22 @@ begin
 		jtag_tms_i     => 'U', -- mode select
 
 		-- Wishbone bus interface (available if MEM_EXT_EN = true) --
-		wb_tag_o       => open, -- request tag
+		wb_tag_o       => master_bus.tag_o, -- request tag
 		wb_adr_o       => master_bus.adr_o, -- address
 		wb_dat_i       => active_slave_resp.rdata_i, -- read data
 		wb_dat_o       => master_bus.dat_o, -- write data
 		wb_we_o        => master_bus.we_o, -- read/write
-		wb_sel_o       => open, -- byte enable
+		wb_sel_o       => master_bus.sel_o, -- byte enable
 		wb_stb_o       => master_bus.stb_o, -- strobe
 		wb_cyc_o       => master_bus.cyc_o, -- valid cycle
-		wb_lock_o      => open, -- exclusive access request
+		wb_lock_o      => master_bus.lock_o, -- exclusive access request
 		wb_ack_i       => active_slave_resp.ack_i, -- transfer acknowledge
 		wb_err_i       => active_slave_resp.err_i, -- transfer error
 
 
 		-- Advanced memory control signals (available if MEM_EXT_EN = true) --
-		fence_o        => open, -- indicates an executed FENCE operation
-		fencei_o       => open, -- indicates an executed FENCEI operation
+		fence_o        => con_fence, -- indicates an executed FENCE operation
+		fencei_o       => con_fencei, -- indicates an executed FENCEI operation
 
 		-- TX stream interfaces (available if SLINK_NUM_TX > 0) --
 		slink_tx_dat_o => open, -- output data
@@ -406,6 +427,41 @@ begin
 		mext_irq_i     => 'L'  -- machine external interrupt
 	);
 
+
+    -- module instance ram --
+    iceduino_ram_inst: entity iceduino.iceduino_ram
+    generic map (
+        ram_addr_inst => x"00002000",
+        ram_width_inst => 262144,
+        ram_addr_data => x"80000000",
+        ram_width_data => 262144,
+        ram_addr_width => 19,
+        write_buffer_width => 4
+    )
+    port map (
+        clk_i  		=>  clk_12mhz,
+        rstn_i 		=>  external_rstn,       
+        adr_i		=>	master_bus.adr_o,
+        dat_i	    =>  master_bus.dat_o,
+        dat_o	    =>  ram_resp.rdata_i,
+        sel_i	    =>  master_bus.sel_o,
+        we_i        =>  master_bus.we_o,
+        stb_i		=>	master_bus.stb_o,
+        cyc_i       =>  master_bus.cyc_o,
+        ack_o       =>  ram_resp.ack_i,
+        err_o       =>  ram_resp.err_i,
+        tag_i       =>  master_bus.tag_o,
+        ram_ce      =>  sram_ce,
+        ram_oe      =>  sram_oe,
+        ram_we      =>  sram_we,
+        ram_addr    =>  sram_addr,
+        ram_data    =>  sram_io,
+        fence_i     =>  con_fence,
+        fencei_i    =>  con_fencei
+        -- ram_data_out    =>  sram_io,
+        -- ram_data_in     =>  con_ram_data_in,
+        -- ram_sb_io_oe => con_ram_sb_io_oe
+    );
   
 	-- module instance led --
     iceduino_led_inst: entity iceduino.iceduino_led
@@ -413,7 +469,7 @@ begin
         led_addr        =>  x"F0000000"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,       
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -432,7 +488,7 @@ begin
         switch_addr        =>  x"F0000008"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -451,7 +507,7 @@ begin
         button_addr        =>  x"F0000010"
     )
     port map (   
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -471,7 +527,7 @@ begin
         pmod_addr_i => x"F0000020"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -491,7 +547,7 @@ begin
         pmod_addr_i => x"F0000030"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -511,7 +567,7 @@ begin
         pmod_addr_i => x"F0000040"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -531,7 +587,7 @@ begin
         gpio_addr_i => x"F0000050"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -550,7 +606,7 @@ begin
         uart_addr  => x"F0000058"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -570,7 +626,7 @@ begin
         spi_addr  => x"F0000060"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -592,7 +648,7 @@ begin
         i2c_addr  => x"F0000068"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -612,7 +668,7 @@ begin
         adc_addr  => x"F0000070"
     )
     port map (
-        clk_i  		=>  clk_50mhz,
+        clk_i  		=>  clk_12mhz,
         rstn_i 		=>  external_rstn,
         adr_i		=>	master_bus.adr_o,
         dat_i	    =>  master_bus.dat_o,
@@ -625,6 +681,19 @@ begin
         scl_o       =>  adc_scl,
         sda         =>  adc_sda       
     );
+    -- ram_io_gen: for i in 0 to 7 generate
+    --     ram_io_inst: SB_IO
+    --     generic map (
+    --         PIN_TYPE => "101001"
+    --     )
+    --     port map (
+    --         PACKAGE_PIN => sram_io(i),
+    --         OUTPUT_ENABLE => con_ram_sb_io_oe,
+    --         D_OUT_0 => con_ram_data_out(i),
+    --         D_IN_0 => con_ram_data_in(i)
+    --     );
+    -- end generate ram_io_gen;
+
 	
 	-- outputs internal --
 	flash_csn <= con_spi_csn(0);

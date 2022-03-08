@@ -5,6 +5,18 @@ package components is
 
   -- Yosys / IceCube wrapper components
 
+  component SB_IO
+  generic (
+    PIN_TYPE  : std_ulogic_vector (5 downto 0)
+  );
+  port (
+    PACKAGE_PIN : inout std_ulogic;
+    OUTPUT_ENABLE : out std_ulogic;
+    D_IN_0 : out std_ulogic;
+    D_OUT_0 : in std_ulogic
+  );
+  end component;
+
   component SB_GB
   port(
     GLOBAL_BUFFER_OUTPUT         : out std_logic;

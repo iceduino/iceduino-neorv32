@@ -44,8 +44,8 @@ set_io -nowarn SDI P11
 set_io -nowarn SCK R11
 set_io -nowarn SS_B R12
 # Programming connector
-set_io -nowarn RxD L11
-set_io -nowarn TxD T16
+set_io -nowarn TxD L11
+set_io -nowarn RxD T16
 # SRAM
 set_io -nowarn SRAM_CS T6
 set_io -nowarn SRAM_OE L9

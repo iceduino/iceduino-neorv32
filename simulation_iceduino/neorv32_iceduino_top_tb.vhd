@@ -57,7 +57,7 @@ begin
 
   neorv32_iceduino_inst: entity iceduino.neorv32_iceduino_top
   port map (
-    clk_50mhz   => clk,
+    clk_12mhz   => clk,
     led         => led, 
     sw          => sw,
     btn         => btn,
